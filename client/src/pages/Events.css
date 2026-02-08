@@ -1,0 +1,205 @@
+.events-hero {
+    background: #f8fafc;
+}
+
+.hero-card-blue {
+    background: #465c8a;
+    color: white;
+    border-radius: 40px;
+    position: relative;
+    overflow: hidden;
+}
+
+.badge-white {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+}
+
+.hero-links span {
+    font-size: 0.9rem;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+.btn-primary-white {
+    background: #1a73e8;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.btn-outline-white {
+    background: transparent;
+    border: 1px solid white;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+/* Grids */
+.events-grid .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+.event-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+}
+
+.ev-thumb {
+    position: relative;
+    height: 200px;
+}
+
+.ev-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.status-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: white;
+}
+
+.status-badge.ongoing {
+    background: #f59e0b;
+}
+
+.status-badge.completed {
+    background: #10b981;
+}
+
+.status-badge.scheduled {
+    background: #1a73e8;
+}
+
+.ev-body {
+    padding: 20px;
+}
+
+.ev-body h3 {
+    font-size: 1.1rem;
+    margin: 0 0 10px 0;
+    color: #1e293b;
+    min-height: 2.8rem;
+}
+
+.ev-tutor {
+    color: #64748b;
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+}
+
+.ev-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 15px;
+}
+
+.ev-price {
+    color: #1a73e8;
+    font-weight: 700;
+}
+
+.ev-date {
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+/* Blogs */
+.blogs-layout {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 25px;
+}
+
+.blog-card {
+    position: relative;
+    border-radius: 24px;
+    overflow: hidden;
+}
+
+.blog-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.blog-main .blog-card.large {
+    height: 500px;
+}
+
+.blog-side-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.blog-card.small {
+    height: 240px;
+}
+
+.blog-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 30px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    color: white;
+}
+
+.blog-overlay h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.blog-overlay h4 {
+    font-size: 1rem;
+    margin-bottom: 8px;
+}
+
+/* Newsletter */
+.newsletter-box {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 30px;
+    padding: 40px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.news-form {
+    display: flex;
+    gap: 15px;
+    width: 50%;
+}
+
+.news-form input {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
