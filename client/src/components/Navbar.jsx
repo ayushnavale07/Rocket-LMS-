@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import API_BASE_URL from '../api/config';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -19,7 +20,7 @@ const Navbar = () => {
         setSearchQuery(query);
         if (query.length > 1) {
             try {
-                const res = await fetch(`${import.meta.env.VITE_API_URL || 'https://rocket-lms-api-v2.loca.lt'}/api/courses/search?query=${query}`);
+                const res = await fetch(`${API_BASE_URL}/api/courses/search?query=${query}`);
                 const data = await res.json();
                 setSuggestions(data);
                 setShowSuggestions(true);

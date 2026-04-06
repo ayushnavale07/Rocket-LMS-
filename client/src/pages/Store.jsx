@@ -31,7 +31,7 @@ const Store = () => {
     useEffect(() => {
         const fetchCourses = async () => {
             try {
-                const res = await axios.get(`${import.meta.env.VITE_API_URL || 'https://rocket-lms-api-v2.loca.lt'}/api/courses`);
+                const res = await axios.get(`${API_BASE_URL}/api/courses`);
                 if (res.data && res.data.length > 0) {
                     setValidCourseId(res.data[0]._id);
                 }
@@ -62,7 +62,7 @@ const Store = () => {
         try {
             // Use the valid course ID as a fallback for mock items
             const targetId = courseId.startsWith('6') ? courseId : validCourseId;
-            const apiBase = import.meta.env.VITE_API_URL || 'https://rocket-lms-api-v2.loca.lt';
+            const apiBase = API_BASE_URL;
             const res = await axios.post(`${apiBase}/api/payment/initiate-order`,
                 { courseId: targetId },
                 { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
@@ -80,7 +80,7 @@ const Store = () => {
         setIsProcessing(true);
         try {
             await new Promise(resolve => setTimeout(resolve, 2000));
-            const apiBase = import.meta.env.VITE_API_URL || 'https://rocket-lms-api-v2.loca.lt';
+            const apiBase = API_BASE_URL;
             const res = await axios.post(`${apiBase}/api/payment/verify-payment`,
                 {
                     courseId: checkoutDetails.courseId,

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import API_BASE_URL from '../api/config';
 import './Home.css';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -38,8 +39,7 @@ const Home = () => {
             return;
         }
         try {
-            const apiBase = import.meta.env.VITE_API_URL || 'https://rocket-lms-api-v2.loca.lt';
-            const res = await axios.post(`${apiBase}/api/payment/initiate-order`,
+            const res = await axios.post(`${API_BASE_URL}/api/payment/initiate-order`,
                 { courseId },
                 { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
             );
@@ -55,7 +55,7 @@ const Home = () => {
         setIsProcessing(true);
         try {
             await new Promise(resolve => setTimeout(resolve, 2000));
-            const res = await axios.post('http://localhost:5000/api/payment/verify-payment',
+            const res = await axios.post(`${API_BASE_URL}/api/payment/verify-payment`,
                 {
                     courseId: checkoutDetails.courseId,
                     amount: checkoutDetails.amount,
@@ -103,7 +103,7 @@ const Home = () => {
             return;
         }
         try {
-            const res = await axios.post('http://localhost:5000/api/reviews',
+            const res = await axios.post(`${API_BASE_URL}/api/reviews`,
                 { ...newReview, type: 'website' },
                 { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
             );

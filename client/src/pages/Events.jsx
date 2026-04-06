@@ -24,7 +24,7 @@ const Events = () => {
     useEffect(() => {
         const fetchCourses = async () => {
             try {
-                const res = await axios.get(`${import.meta.env.VITE_API_URL || 'https://rocket-lms-api-v2.loca.lt'}/api/courses`);
+                const res = await axios.get(`${API_BASE_URL}/api/courses`);
                 if (res.data && res.data.length > 0) {
                     setValidCourseId(res.data[0]._id);
                 }
