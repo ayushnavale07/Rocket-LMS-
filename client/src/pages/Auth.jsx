@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import API_BASE_URL from '../api/config';
 import './Auth.css';
 
 const Auth = () => {
@@ -32,9 +33,8 @@ const Auth = () => {
 
         const endpoint = isLogin ? '/api/auth/login' : '/api/auth/signup';
         try {
-            console.log(`Sending auth request to: ${endpoint}`);
-            const apiBase = import.meta.env.VITE_API_URL || 'https://rocket-lms-api-v2.loca.lt';
-            const res = await axios.post(`${apiBase}${endpoint}`, formData);
+            console.log(`Sending auth request to: ${API_BASE_URL}${endpoint}`);
+            const res = await axios.post(`${API_BASE_URL}${endpoint}`, formData);
 
             if (res.data.token) {
                 localStorage.setItem('token', res.data.token);
