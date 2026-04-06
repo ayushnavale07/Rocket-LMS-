@@ -66,6 +66,10 @@ app.get('/api/health', (req, res) => {
     });
 });
 
+app.get('/api/test-deploy', (req, res) => {
+    res.json({ message: "🚀 DEPLOYMENT SUCCESSFUL - V3", time: new Date().toISOString() });
+});
+
 app.get('/', (req, res) => {
     res.send('Rocket LMS API is running...');
 });
