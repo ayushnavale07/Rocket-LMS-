@@ -259,7 +259,7 @@ const Courses = () => {
                             <p>Loading...</p>
                         ) : (
                             filteredCourses.slice((page - 1) * 6, page * 6).map(course => (
-                                <div className="course-card white-bg" key={course._id}>
+                                <div className="course-card-premium" key={course._id}>
                                     <div className="course-thumb">
                                         <img src={course.image} alt={course.title} />
                                         <div className="overlay-badge">
@@ -273,20 +273,26 @@ const Courses = () => {
                                         </div>
                                     </div>
                                     <div className="course-info">
-                                        <h3>{course.title}</h3>
+                                        <h3 className="course-title-main">{course.title}</h3>
                                         <div className="stars">
                                             {[...Array(5)].map((_, i) => (
                                                 <span key={i} className={i < Math.round(course.rating || 5) ? "star-active" : "star-inactive"}>⭐</span>
                                             ))}
                                         </div>
-                                        <div className="instructor">
-                                            👤 {course.instructor} <span className="cat-text">in {course.category}</span>
+                                        <div className="instructor-meta">
+                                            <span className="icon">👤</span> {course.instructor} <span className="cat-text">in {course.category}</span>
                                         </div>
-                                        <div className="course-footer">
-                                            <div className="price">
-                                                ${course.price} {course.originalPrice > course.price && <span className="old-price">${course.originalPrice}</span>}
+                                        <div className="course-card-footer">
+                                            <div className="price-section">
+                                                <span className="current-price">${course.price}</span>
+                                                {course.originalPrice > course.price && <span className="discounted-price">${course.originalPrice}</span>}
                                             </div>
-                                            <button className="btn-buy" onClick={() => handlePurchase(course._id)} style={{ padding: '6px 12px', fontSize: '0.8rem', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Buy Now</button>
+                                            <div className="duration-info">
+                                                <span>🕒 {course.duration}</span>
+                                            </div>
+                                        </div>
+                                        <div style={{ marginTop: '15px' }}>
+                                            <button className="btn btn-primary w-100" onClick={() => handlePurchase(course._id)} style={{ padding: '8px', fontSize: '0.9rem', borderRadius: '6px' }}>💳 Buy Now with Razorpay</button>
                                         </div>
                                     </div>
                                 </div>
