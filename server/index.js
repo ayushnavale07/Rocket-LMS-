@@ -16,7 +16,9 @@ const allowedOrigins = [
 
 app.use(cors({
     origin: function (origin, callback) {
-        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        // Allow all origins for the live demo to ensure connectivity
+        // In a strict production app, you would list only your vercel.app domain here
+        if (!origin || origin.includes('vercel.app') || origin.includes('localhost') || origin.includes('loca.lt')) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
