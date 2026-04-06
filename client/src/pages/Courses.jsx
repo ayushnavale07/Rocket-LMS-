@@ -259,7 +259,7 @@ const Courses = () => {
                             <p>Loading...</p>
                         ) : (
                             filteredCourses.slice((page - 1) * 6, page * 6).map(course => (
-                                <div className="course-card-premium" key={course._id} onClick={() => handlePurchase(course._id)}>
+                                <div className="course-card white-bg" key={course._id}>
                                     <div className="course-thumb">
                                         <img src={course.image} alt={course.title} />
                                         <div className="overlay-badge">
@@ -273,23 +273,20 @@ const Courses = () => {
                                         </div>
                                     </div>
                                     <div className="course-info">
-                                        <h3 className="course-title-main">{course.title}</h3>
+                                        <h3>{course.title}</h3>
                                         <div className="stars">
                                             {[...Array(5)].map((_, i) => (
-                                                <span key={i} className={i < Math.round(course.rating) ? "star-active" : "star-inactive"}>⭐</span>
+                                                <span key={i} className={i < Math.round(course.rating || 5) ? "star-active" : "star-inactive"}>⭐</span>
                                             ))}
                                         </div>
-                                        <div className="instructor-meta">
-                                            <span className="icon">👤</span> {course.instructor} <span className="cat-text">in {course.category}</span>
+                                        <div className="instructor">
+                                            👤 {course.instructor} <span className="cat-text">in {course.category}</span>
                                         </div>
-                                        <div className="course-card-footer">
-                                            <div className="price-section">
-                                                <span className="current-price">${course.price}</span>
-                                                {course.originalPrice > course.price && <span className="discounted-price">${course.originalPrice}</span>}
+                                        <div className="course-footer">
+                                            <div className="price">
+                                                ${course.price} {course.originalPrice > course.price && <span className="old-price">${course.originalPrice}</span>}
                                             </div>
-                                            <div className="duration-info">
-                                                <span>🕒 {course.duration}</span>
-                                            </div>
+                                            <button className="btn-buy" onClick={() => handlePurchase(course._id)} style={{ padding: '6px 12px', fontSize: '0.8rem', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Buy Now</button>
                                         </div>
                                     </div>
                                 </div>
@@ -352,20 +349,20 @@ const Courses = () => {
                     </div>
                     <div className="courses-grid mt-5">
                         {(showAllDiscounted ? courses : courses.slice(0, 3)).map(course => (
-                            <div className="course-card white-bg" key={course._id} onClick={() => handlePurchase(course._id)}>
+                            <div className="course-card white-bg" key={course._id}>
                                 <div className="course-thumb">
                                     <img src={course.image} alt={course.title} />
                                     {course.originalPrice > course.price && <span className="promo-badge">On Sale</span>}
                                 </div>
                                 <div className="course-info">
                                     <h3>{course.title}</h3>
-                                    <div className="stars">{"⭐".repeat(Math.round(course.rating))} ({course.students || 120})</div>
+                                    <div className="stars">{"⭐".repeat(Math.round(course.rating || 5))} ({course.students || 120})</div>
                                     <div className="instructor">👤 {course.instructor}</div>
                                     <div className="course-footer">
                                         <div className="price">
                                             ${course.price} {course.originalPrice && <span className="old-price">${course.originalPrice}</span>}
                                         </div>
-                                        <div className="duration">🕒 {course.duration}</div>
+                                        <button className="btn-buy" onClick={() => handlePurchase(course._id)} style={{ padding: '6px 12px', fontSize: '0.8rem', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Buy Now</button>
                                     </div>
                                 </div>
                             </div>
@@ -386,17 +383,17 @@ const Courses = () => {
                     <p className="text-white text-center opacity-75 mb-5">Access top-quality free courses anytime, expand your skills, and learn without spending a single dollar</p>
                     <div className="courses-grid">
                         {(showAllFree ? courses : courses.slice(1, 4)).map(course => (
-                            <div className="course-card white-bg" key={course._id} onClick={() => handlePurchase(course._id)}>
+                            <div className="course-card white-bg" key={course._id}>
                                 <div className="course-thumb">
                                     <img src={course.image} alt={course.title} />
                                 </div>
                                 <div className="course-info">
                                     <h3>{course.title}</h3>
-                                    <div className="stars">{"⭐".repeat(Math.round(course.rating))} ({course.students || 85})</div>
+                                    <div className="stars">{"⭐".repeat(Math.round(course.rating || 5))} ({course.students || 85})</div>
                                     <div className="instructor">👤 {course.instructor}</div>
                                     <div className="course-footer">
                                         <div className="price text-success">Free</div>
-                                        <div className="duration">🕒 {course.duration}</div>
+                                        <button className="btn-buy" onClick={() => handlePurchase(course._id)} style={{ padding: '6px 12px', fontSize: '0.8rem', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Buy Now</button>
                                     </div>
                                 </div>
                             </div>
