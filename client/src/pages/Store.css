@@ -15,16 +15,18 @@
 
 .product-card {
     background: white;
-    border-radius: 16px;
+    border-radius: 20px;
     overflow: hidden;
     display: flex;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s;
-    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid #f1f5f9;
 }
 
 .product-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border-color: #1a73e8;
 }
 
 .product-img {
@@ -73,6 +75,23 @@
     font-size: 1.1rem;
 }
 
+.btn-buy-mini {
+    background: #1a73e8;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-buy-mini:hover {
+    background: #1557b0;
+    transform: scale(1.05);
+}
+
 /* Plans */
 .plans-grid {
     display: grid;
@@ -82,16 +101,27 @@
 
 .plan-card {
     background: white;
-    padding: 40px;
-    border-radius: 20px;
+    padding: 50px 40px;
+    border-radius: 30px;
     text-align: center;
     position: relative;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #f1f5f9;
+    transition: all 0.4s ease;
+}
+
+.plan-card:hover {
+    transform: translateY(-15px);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1);
 }
 
 .plan-card.popular {
     border: 2px solid #1a73e8;
     transform: scale(1.05);
+    z-index: 10;
+}
+
+.plan-card.popular:hover {
+    transform: scale(1.07) translateY(-15px);
 }
 
 .popular-badge {

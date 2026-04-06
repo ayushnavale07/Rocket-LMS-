@@ -7,7 +7,23 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://rocket-lms-v2.loca.lt',
+    process.env.CLIENT_URL
+].filter(Boolean);
+
+app.use(cors({
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true
+}));
 app.use(express.json());
 
 // Routes
@@ -26,17 +42,18 @@ app.use('/api/forum', forumRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/newsletter', newsletterRoutes);
-
-// MongoDB Connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/rocket_lms';
-
-mongoose.connect(MONGODB_URI)
-    .then(() => {
-        console.log('MongoDB connected successfully');
-    })
+// Database Connection
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/rocket-lms')
+    .then(() => console.log('✅ Connected to MongoDB Atlas'))
     .catch(err => {
-        console.error('CRITICAL: MongoDB connection error:', err.message);
+        console.error('⚠️ MongoDB connection failed. Starting server in LIMITED MODE.');
+        console.error('Error details:', err.message);
     });
+
+// Start Server
+app.listen(PORT, () => {
+    console.log(`🚀 Server is running on port ${PORT}`);
+});
 
 app.get('/api/health', (req, res) => {
     res.json({
@@ -49,8 +66,4 @@ app.get('/api/health', (req, res) => {
 
 app.get('/', (req, res) => {
     res.send('Rocket LMS API is running...');
-});
-
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
 });

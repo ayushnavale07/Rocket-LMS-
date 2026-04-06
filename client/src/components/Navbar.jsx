@@ -10,6 +10,35 @@ const Navbar = () => {
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [showProfileModal, setShowProfileModal] = useState(false);
     const [modalConfig, setModalConfig] = useState({ title: '', message: '' });
+    const [searchQuery, setSearchQuery] = useState('');
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+
+    const handleSearchChange = async (e) => {
+        const query = e.target.value;
+        setSearchQuery(query);
+        if (query.length > 1) {
+            try {
+                const res = await fetch(`${import.meta.env.VITE_API_URL || 'https://rocket-lms-api-v2.loca.lt'}/api/courses/search?query=${query}`);
+                const data = await res.json();
+                setSuggestions(data);
+                setShowSuggestions(true);
+            } catch (err) {
+                console.error(err);
+            }
+        } else {
+            setSuggestions([]);
+            setShowSuggestions(false);
+        }
+    };
+
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            navigate(`/search?q=${searchQuery}`);
+            setShowSuggestions(false);
+        }
+    };
 
     const showAlertModal = (title, message) => {
         setModalConfig({ title, message });
@@ -35,7 +64,7 @@ const Navbar = () => {
             return;
         }
 
-        if (['/courses', '/instructors', '/store', '/forums', '/events', '/meeting', '/rewards', '/dashboard'].includes(path) && !user) {
+        if (['/courses', '/instructors', '/store', '/forums', '/events', '/bundles', '/meeting', '/rewards', '/dashboard', '/admin-dashboard'].includes(path) && !user) {
             showAlertModal("Authentication Required", "Please login or sign up first to continue further!");
             return;
         }
@@ -65,9 +94,36 @@ const Navbar = () => {
                                 <option value="fr">Français</option>
                             </select>
                         </div>
-                        <div className="search-bar">
-                            <input type="text" placeholder="Search..." />
-                            <button>🔍</button>
+                        <div className="search-bar-container">
+                            <form className="search-bar" onSubmit={handleSearchSubmit}>
+                                <input
+                                    type="text"
+                                    placeholder="Search for courses..."
+                                    value={searchQuery}
+                                    onChange={handleSearchChange}
+                                    onFocus={() => searchQuery.length > 1 && setShowSuggestions(true)}
+                                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                                />
+                                <button type="submit">🔍</button>
+                            </form>
+                            {showSuggestions && suggestions.length > 0 && (
+                                <div className="search-suggestions">
+                                    {suggestions.map((course) => (
+                                        <div
+                                            key={course._id}
+                                            className="suggestion-item"
+                                            onClick={() => {
+                                                navigate(`/courses`); // Navigating to courses for simplicity or could go to specific course
+                                                setSearchQuery(course.title);
+                                                setShowSuggestions(false);
+                                            }}
+                                        >
+                                            <span className="suggestion-title">{course.title}</span>
+                                            <span className="suggestion-category">{course.category}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                         <div className="auth-links">
                             {user ? (
@@ -95,7 +151,7 @@ const Navbar = () => {
                     </div>
                     <ul className="nav-links">
                         <li className={`nav-categories ${location.pathname === '/categories' ? 'active' : ''}`} onClick={() => handleNavClick('/categories')}>
-                            <span className="cat-icon-mini">☰</span> Categories
+                            <span className="cat-icon-mini">☰</span>
                         </li>
                         <li className={location.pathname === '/' ? 'active' : ''} onClick={() => navigate('/')}>Home</li>
                         <li className={location.pathname === '/courses' ? 'active' : ''} onClick={() => handleNavClick('/courses')}>Courses</li>
@@ -103,6 +159,10 @@ const Navbar = () => {
                         <li className={location.pathname === '/store' ? 'active' : ''} onClick={() => handleNavClick('/store')}>Store</li>
                         <li className={location.pathname === '/forums' ? 'active' : ''} onClick={() => handleNavClick('/forums')}>Forums</li>
                         <li className={location.pathname === '/events' ? 'active' : ''} onClick={() => handleNavClick('/events')}>Events</li>
+                        <li className={location.pathname === '/bundles' ? 'active' : ''} onClick={() => handleNavClick('/bundles')}>Bundles</li>
+                        {user && user.role === 'admin' && (
+                            <li className={location.pathname === '/admin-dashboard' ? 'active' : ''} onClick={() => navigate('/admin-dashboard')} style={{color: '#f59e0b', fontWeight: 'bold'}}>🛡️ Admin</li>
+                        )}
                     </ul>
                     <button className="btn btn-primary" onClick={() => handleNavClick(user ? '/courses' : '/auth')}>Start Learning</button>
                 </div>
@@ -150,7 +210,7 @@ const Navbar = () => {
                                 </div>
                                 <div className="p-stat">
                                     <strong>Role</strong>
-                                    <span>Student</span>
+                                    <span style={{textTransform: 'capitalize'}}>{user.role || 'Student'}</span>
                                 </div>
                             </div>
                             <div className="profile-links">

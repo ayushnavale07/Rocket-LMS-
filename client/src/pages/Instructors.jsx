@@ -60,8 +60,8 @@ const Instructors = () => {
                                     <h3>{inst.name}</h3>
                                     <p>{inst.title}</p>
                                     <div className="inst-rating">⭐ {inst.rating}</div>
+                                    <button className="profile-link">👤</button>
                                 </div>
-                                <button className="profile-link">👤</button>
                             </div>
                         ))}
                     </div>

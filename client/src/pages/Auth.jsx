@@ -6,6 +6,7 @@ import './Auth.css';
 const Auth = () => {
     const [isLogin, setIsLogin] = useState(true);
     const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
@@ -32,7 +33,8 @@ const Auth = () => {
         const endpoint = isLogin ? '/api/auth/login' : '/api/auth/signup';
         try {
             console.log(`Sending auth request to: ${endpoint}`);
-            const res = await axios.post(`http://127.0.0.1:5000${endpoint}`, formData);
+            const apiBase = import.meta.env.VITE_API_URL || 'https://rocket-lms-api-v2.loca.lt';
+            const res = await axios.post(`${apiBase}${endpoint}`, formData);
 
             if (res.data.token) {
                 localStorage.setItem('token', res.data.token);
@@ -55,6 +57,7 @@ const Auth = () => {
 
     return (
         <div className="auth-container">
+            <button className="back-btn" onClick={() => navigate('/')}>← Back to Home</button>
             <div className="auth-card">
                 <h2 className="font-outfit">{isLogin ? 'Login' : 'Create Account'}</h2>
                 {error && <div className="error-msg">{error}</div>}
@@ -79,14 +82,24 @@ const Auth = () => {
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         />
                     </div>
-                    <div className="form-group">
+                    <div className="form-group password-group">
                         <label>Password</label>
-                        <input
-                            type="password"
-                            placeholder="••••••••"
-                            required
-                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                        />
+                        <div className="password-input-wrapper">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                placeholder="••••••••"
+                                required
+                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                            />
+                            <button
+                                type="button"
+                                className="password-toggle"
+                                onClick={() => setShowPassword(!showPassword)}
+                                title={showPassword ? "Hide Password" : "Show Password"}
+                            >
+                                {showPassword ? '👁️‍🗨️' : '👁️'}
+                            </button>
+                        </div>
                     </div>
                     <button type="submit" className="btn btn-primary w-100" disabled={loading}>
                         {loading ? 'Processing...' : (isLogin ? 'Login' : 'Sign Up')}

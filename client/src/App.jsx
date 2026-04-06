@@ -10,6 +10,9 @@ import Events from './pages/Events';
 import Meeting from './pages/Meeting';
 import Rewards from './pages/Rewards';
 import Dashboard from './pages/Dashboard';
+import SearchResults from './pages/SearchResults';
+import Bundles from './pages/Bundles';
+import AdminDashboard from './pages/AdminDashboard';
 import AIChatbot from './components/AIChatbot';
 
 function App() {
@@ -20,6 +23,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/courses" element={<Courses />} />
+          <Route path="/search" element={<SearchResults />} />
+          <Route path="/bundles" element={<Bundles />} />
           <Route path="/store" element={<Store />} />
           <Route path="/instructors" element={<Instructors />} />
           <Route path="/forums" element={<Forums />} />
@@ -27,6 +32,7 @@ function App() {
           <Route path="/meeting" element={<Meeting />} />
           <Route path="/rewards" element={<Rewards />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
         </Routes>
         <AIChatbot />
       </div>

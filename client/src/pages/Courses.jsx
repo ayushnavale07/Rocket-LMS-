@@ -34,12 +34,7 @@ const Courses = () => {
     const [showAllDiscounted, setShowAllDiscounted] = useState(false);
     const [showAllFree, setShowAllFree] = useState(false);
 
-    const upcomingCourses = [
-        { id: 101, title: 'Laravel Advanced Programming', tutor: 'Kate Williams', price: 90, duration: '8:00 Hours', date: '20 Apr 2025 08:00', image: 'https://images.unsplash.com/photo-1537432376769-00f5c2f4c8d2?auto=format&fit=crop&q=80&w=400' },
-        { id: 102, title: 'Web Design for Beginners', tutor: 'Linda Anderson', price: 10, duration: '3:30 Hours', date: '15 Mar 2025 00:00', image: 'https://images.unsplash.com/photo-1547658719-da2b81169142?auto=format&fit=crop&q=80&w=400' },
-        { id: 103, title: 'Digital Photography', tutor: 'Ricardo Dave', price: 50, duration: '6:00 Hours', date: '20 Jan 2025 16:00', image: 'https://images.unsplash.com/photo-1554048845-762bc466bd14?auto=format&fit=crop&q=80&w=400' },
-        { id: 104, title: 'Python for Beginners', tutor: 'Robert Ransdell', price: 100, duration: '1:00 Hours', date: '15 Feb 2025 10:00', image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80&w=400' }
-    ];
+    const [upcomingCourses, setUpcomingCourses] = useState([]);
 
     const discountedCoursesArr = [
         { id: 201, title: 'Excel from Beginner to Advanced', tutor: 'Robert Ransdell', price: 80, oldPrice: 100, discount: '20%', duration: '1:40 Hours', rating: 5, image: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&q=80&w=400' },
@@ -66,7 +61,11 @@ const Courses = () => {
         const fetchCourses = async () => {
             try {
                 const res = await axios.get('http://localhost:5000/api/courses');
-                let data = res.data;
+                const allFetched = res.data;
+                const regular = allFetched.filter(c => !c.isUpcoming);
+                const upcoming = allFetched.filter(c => c.isUpcoming);
+
+                let data = regular;
 
                 // Sidebar Type Filter
                 if (sidebarFilters.types.length > 0) {
@@ -90,8 +89,7 @@ const Courses = () => {
                 if (toggles.free) data = data.filter(c => c.price === 0);
                 if (toggles.discount) data = data.filter(c => c.originalPrice > c.price);
                 if (toggles.upcoming) {
-                    // Filter logic or use hardcoded upcoming list if desired
-                    // For now, let's just keep the existing courses but apply filter
+                    data = upcoming;
                 }
 
                 // Sort Logic
@@ -103,6 +101,7 @@ const Courses = () => {
 
                 setCourses(data);
                 setFilteredCourses(data);
+                setUpcomingCourses(upcoming);
                 setTotalPages(Math.ceil(data.length / 6));
             } catch (err) {
                 console.error("Error fetching courses", err);
@@ -307,19 +306,20 @@ const Courses = () => {
                     <p className="text-center text-secondary mb-5">Stay ahead with fresh courses launching soon, designed to expand your skills and knowledge further</p>
                     <div className="upcoming-grid">
                         {upcomingCourses.map(course => (
-                            <div className="upcoming-card" key={course.id}>
+                            <div className="upcoming-card" key={course._id}>
                                 <div className="u-image">
                                     <img src={course.image} alt={course.title} />
-                                    <span className="date-badge">📅 {course.date}</span>
+                                    <span className="date-badge">📅 {course.launchDate}</span>
                                 </div>
                                 <div className="u-info">
                                     <h3>{course.title}</h3>
                                     <div className="u-meta">
-                                        <div className="u-tutor">👤 {course.tutor}</div>
+                                        <div className="u-tutor">👤 {course.instructor}</div>
                                         <div className="u-duration">🕒 {course.duration}</div>
                                     </div>
                                     <div className="u-footer">
                                         <span className="price">${course.price}</span>
+                                        <button className="btn-buy-now ml-auto" onClick={() => handlePurchase(course._id)}>Buy Now</button>
                                     </div>
                                 </div>
                             </div>

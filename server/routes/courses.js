@@ -52,7 +52,11 @@ router.post('/seed', async (req, res) => {
             // Lifestyle & Other
             { title: "Lifestyle & Productivity", instructor: "Jessica Wray", price: 12, originalPrice: 18, image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=400", category: "Lifestyle", rating: 4.5, reviewsCount: 60, duration: "1:50 Hours", type: "Text Lesson" },
             { title: "Photography for Beginners", instructor: "Robert Ransdell", price: 15, originalPrice: 30, image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=400", category: "Lifestyle", rating: 4.5, reviewsCount: 110, duration: "2:40 Hours", type: "Course" },
-            { title: "Nutrition for Athletes", instructor: "Jessica Wray", price: 18, originalPrice: 25, image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&q=80&w=400", category: "Health & Fitness", rating: 4.7, reviewsCount: 45, duration: "2:10 Hours", type: "Course" }
+            { title: "Nutrition for Athletes", instructor: "Jessica Wray", price: 18, originalPrice: 25, image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&q=80&w=400", category: "Health & Fitness", rating: 4.7, reviewsCount: 45, duration: "2:10 Hours", type: "Course" },
+            { title: "Laravel Advanced Programming", instructor: "Kate Williams", price: 90, originalPrice: 120, image: "https://images.unsplash.com/photo-1537432376769-00f5c2f4c8d2?auto=format&fit=crop&q=80&w=400", category: "Web Development", rating: 0, reviewsCount: 0, duration: "8:00 Hours", type: "Course", isUpcoming: true, launchDate: "20 Apr 2025 08:00" },
+            { title: "Web Design for Beginners", instructor: "Linda Anderson", price: 10, originalPrice: 20, image: "https://images.unsplash.com/photo-1547658719-da2b81169142?auto=format&fit=crop&q=80&w=400", category: "Design", rating: 0, reviewsCount: 0, duration: "3:30 Hours", type: "Course", isUpcoming: true, launchDate: "15 Mar 2025 00:00" },
+            { title: "Digital Photography", instructor: "Ricardo Dave", price: 50, originalPrice: 70, image: "https://images.unsplash.com/photo-1554048845-762bc466bd14?auto=format&fit=crop&q=80&w=400", category: "Lifestyle", rating: 0, reviewsCount: 0, duration: "6:00 Hours", type: "Course", isUpcoming: true, launchDate: "20 Jan 2025 16:00" },
+            { title: "Python for Beginners", instructor: "Robert Ransdell", price: 100, originalPrice: 150, image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80&w=400", category: "Science", rating: 0, reviewsCount: 0, duration: "1:00 Hours", type: "Course", isUpcoming: true, launchDate: "15 Feb 2025 10:00" }
         ];
 
         await Course.deleteMany({});
@@ -64,6 +68,23 @@ router.post('/seed', async (req, res) => {
 });
 
 const Enrollment = require('../models/Enrollment');
+
+// Search courses
+router.get('/search', async (req, res) => {
+    const { query } = req.query;
+    try {
+        if (!query) return res.json([]);
+        const courses = await Course.find({
+            $or: [
+                { title: { $regex: query, $options: 'i' } },
+                { category: { $regex: query, $options: 'i' } }
+            ]
+        }).limit(10);
+        res.json(courses);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
 
 // Get enrolled courses for a user
 router.get('/enrolled/:userId', async (req, res) => {

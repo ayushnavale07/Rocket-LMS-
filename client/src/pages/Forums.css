@@ -25,10 +25,11 @@
 }
 
 .hero-content-box h1 {
-    font-size: 3rem;
-    color: #1e293b;
+    font-size: 3.5rem;
+    color: #0f172a;
     margin-bottom: 1.5rem;
-    line-height: 1.2;
+    line-height: 1.1;
+    font-weight: 800;
 }
 
 .hero-content-box p {
@@ -105,17 +106,19 @@
 
 .topic-card {
     background: white;
-    border-radius: 16px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid #f1f5f9;
+    display: flex;
+    flex-direction: column;
 }
 
 .topic-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    border-color: #3b82f6;
+    transform: translateY(-12px);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1);
+    border-color: #1a73e8;
 }
 
 .topic-header {
@@ -143,9 +146,10 @@
 
 .topic-card p {
     color: #64748b;
-    font-size: 0.9375rem;
+    font-size: 0.95rem;
     margin-bottom: 1.5rem;
-    line-height: 1.5;
+    line-height: 1.6;
+    flex-grow: 1;
 }
 
 .topic-footer {

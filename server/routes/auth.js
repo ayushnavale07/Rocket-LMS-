@@ -29,7 +29,7 @@ router.post('/signup', async (req, res) => {
         await user.save();
 
         const token = jwt.sign({ userId: user._id }, JWT_SECRET);
-        res.status(201).json({ token, user: { id: user._id, name: user.name, email: user.email } });
+        res.status(201).json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
     } catch (error) {
         console.error('Signup error:', error);
         res.status(500).json({ message: 'Server error: ' + error.message });
@@ -76,7 +76,7 @@ router.post('/login', async (req, res) => {
         }
 
         const token = jwt.sign({ userId: user._id }, JWT_SECRET);
-        res.json({ token, user: { id: user._id, name: user.name, email: user.email } });
+        res.json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ message: 'Server error: ' + error.message });

@@ -38,7 +38,8 @@ const Home = () => {
             return;
         }
         try {
-            const res = await axios.post('http://localhost:5000/api/payment/initiate-order',
+            const apiBase = import.meta.env.VITE_API_URL || 'https://rocket-lms-api-v2.loca.lt';
+            const res = await axios.post(`${apiBase}/api/payment/initiate-order`,
                 { courseId },
                 { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
             );
@@ -73,7 +74,7 @@ const Home = () => {
     useEffect(() => {
         const fetchCourses = async () => {
             try {
-                const res = await axios.get('http://localhost:5000/api/courses');
+                const res = await axios.get(`${import.meta.env.VITE_API_URL || 'https://rocket-lms-api-v2.loca.lt'}/api/courses`);
                 setCourses(res.data);
             } catch (err) {
                 console.error("Error fetching courses", err);
@@ -122,6 +123,11 @@ const Home = () => {
             }
             return;
         }
+
+        if (['/courses', '/instructors', '/store', '/forums', '/events', '/meeting', '/rewards', '/dashboard'].includes(path) && !user) {
+            showAlertModal("Authentication Required", "Please login or sign up first to continue further!");
+            return;
+        }
         navigate(path);
     };
 
@@ -165,7 +171,7 @@ const Home = () => {
                             <div className="rotating-badge">
                                 <svg viewBox="0 0 100 100" width="100" height="100">
                                     <path id="circlePath" d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0 " fill="none" />
-                                    <text font-size="8">
+                                    <text fontSize="8">
                                         <textPath href="#circlePath">Courses in Different Categories • 2500+ • </textPath>
                                     </text>
                                 </svg>
@@ -219,7 +225,6 @@ const Home = () => {
             {/* Course Grid Section */}
             <section className="course-section container">
                 <div className="section-header">
-                    <div className="badge">Featured</div>
                     <h2 className="font-outfit">Featured Courses</h2>
                     <p>Explore our top-rated courses, handpicked to boost your skills and accelerate your learning journey.</p>
                 </div>
@@ -325,13 +330,50 @@ const Home = () => {
                 </div>
             </section>
 
+            {/* Bundle Teaser Section */}
+            <section className="horizontal-section bundle-teaser bg-light">
+                <div className="container hs-container">
+                    <div className="hs-intro">
+                        <h2 className="font-outfit">Course Bundles For Maximum Savings</h2>
+                        <p>Unlock more value with curated course bundles. Get multiple courses at a discounted price.</p>
+                        <button className="view-more" onClick={() => handleNavClick('/bundles')}>View More ➔</button>
+                    </div>
+                    <div className="hs-grid">
+                        {[
+                            { title: "Become a Probability & Statistics Master", img: "https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&q=80&w=400", price: 25, courses: 2, instructor: "Prof. Sarah Johnson", rating: 5 },
+                            { title: "Microsoft Office Beginner to Expert Bundle", img: "https://images.unsplash.com/photo-1542744094-3a31f272c490?auto=format&fit=crop&q=80&w=400", price: 50, courses: 4, instructor: "Tech Academy", rating: 4.8 },
+                            { title: "A-Z Web Programming", img: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=400", price: 8, courses: 2, instructor: "Dev Mastery", rating: 4.9 },
+                        ].map((bundle, idx) => (
+                            <div className="hs-card" key={idx}>
+                                <div className="hs-thumb">
+                                    <img src={bundle.img} alt={bundle.title} />
+                                    <span className="hs-promo">BUNDLE</span>
+                                </div>
+                                <div className="hs-info">
+                                    <h3>{bundle.title}</h3>
+                                    <div className="stars">{"⭐".repeat(Math.round(bundle.rating))} ({bundle.rating})</div>
+                                    <div className="instructor-row">
+                                        👤 {bundle.instructor}
+                                    </div>
+                                    <div className="hs-footer">
+                                        <span className="hs-price">${bundle.price}</span>
+                                        <span className="hs-duration">{bundle.courses} Courses</span>
+                                    </div>
+                                    <button className="btn-buy mt-2 w-100" onClick={() => handlePurchase('bundle-' + idx)}>Buy Bundle</button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
             {/* Bestsellers Section (Blue) */}
             <section className="horizontal-section bestseller-blue">
                 <div className="container hs-container">
                     <div className="hs-intro">
                         <h2 className="font-outfit">Bestsellers Chosen by Our Students</h2>
                         <p>Explore our top-selling courses, chosen by thousands of learners who've enrolled and benefitted.</p>
-                        <button className="view-more" onClick={() => navigate('/courses')}>View More ➔</button>
+                        <button className="view-more" onClick={() => handleNavClick('/courses')}>View More ➔</button>
                     </div>
                     <div className="hs-grid">
                         {courses.filter(c => ['Excel from Beginner to Advanced', 'New In-App Live System', 'Learn Linux in 5 Days'].includes(c.title)).map((course, idx) => (
@@ -363,7 +405,7 @@ const Home = () => {
                     <div className="hs-intro">
                         <h2 className="font-outfit">Top Rated Courses</h2>
                         <p>Handpicked courses with exceptional ratings from our global learning community.</p>
-                        <button className="view-more" onClick={() => navigate('/courses')}>View More ➔</button>
+                        <button className="view-more" onClick={() => handleNavClick('/courses')}>View More ➔</button>
                     </div>
                     <div className="hs-grid">
                         {courses.filter(c => c.rating >= 4.9).slice(0, 3).map((course, idx) => (
@@ -379,7 +421,7 @@ const Home = () => {
                                     </div>
                                     <div className="hs-footer">
                                         <span className="hs-price">${course.price}</span>
-                                        <span className="hs-duration">🕒 {course.duration}</span>
+                                        <button className="btn-buy" onClick={() => handlePurchase(course._id)} style={{ padding: '6px 12px', fontSize: '0.8rem' }}>Buy Now</button>
                                     </div>
                                 </div>
                             </div>
@@ -388,36 +430,6 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* Bundle Section */}
-            <section className="course-section container">
-                <div className="section-header">
-                    <div className="badge">Bundles</div>
-                    <h2 className="font-outfit">Course Bundles For Maximum Savings</h2>
-                    <p>Unlock more value with curated course bundles.</p>
-                </div>
-                <div className="course-grid">
-                    {[
-                        { title: "Become a Probability & Statistics Master", img: "https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&q=80&w=400", price: 25, courses: 2 },
-                        { title: "Microsoft Office Beginner to Expert Bundle", img: "https://images.unsplash.com/photo-1542744094-3a31f272c490?auto=format&fit=crop&q=80&w=400", price: 50, courses: 4 },
-                        { title: "A-Z Web Programming", img: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=400", price: 8, courses: 2 },
-                        { title: "Solar Energy Design Course From Zero To Hero", img: "https://images.unsplash.com/photo-1509391366360-fe5bb6583e2c?auto=format&fit=crop&q=80&w=400", price: 25, courses: 2 },
-                    ].map((bundle, idx) => (
-                        <div className="course-card" key={idx}>
-                            <div className="course-thumb">
-                                <img src={bundle.img} alt={bundle.title} />
-                            </div>
-                            <div className="course-info">
-                                <h3>{bundle.title}</h3>
-                                <div className="course-footer">
-                                    <div className="price">${bundle.price}</div>
-                                    <div className="instructor">{bundle.courses} Courses</div>
-                                </div>
-                                <button className="btn btn-primary w-100 mt-3" onClick={() => handlePurchase('bundle-' + idx)}>Buy Bundle</button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </section>
 
 
             {/* Subscription Plans Section (PNG 4) */}
@@ -485,7 +497,6 @@ const Home = () => {
                         </div>
                         <div className="rewards-img">
                             <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=600" alt="Success" />
-                            <div className="trophy-art" style={{ position: 'absolute', top: '-30px', left: '-30px', fontSize: '4rem' }}>🏆</div>
                         </div>
                     </div>
                 </div>

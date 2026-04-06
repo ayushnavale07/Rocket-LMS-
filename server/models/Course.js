@@ -12,7 +12,9 @@ const courseSchema = new mongoose.Schema({
     duration: { type: String },
     studentsCount: { type: Number, default: 0 },
     type: { type: String, enum: ['Course', 'Live Class', 'Text Lesson'], default: 'Course' },
-    description: { type: String }
+    description: { type: String },
+    isUpcoming: { type: Boolean, default: false },
+    launchDate: { type: String }
 });
 
 module.exports = mongoose.model('Course', courseSchema);

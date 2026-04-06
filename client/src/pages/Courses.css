@@ -418,6 +418,37 @@
     margin-bottom: 15px;
 }
 
+.u-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 15px;
+}
+
+.u-footer .price {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.btn-buy-now {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-buy-now:hover {
+    background: #1557b0;
+    transform: scale(1.05);
+}
+
 .secondary-bg {
     background-color: #1e293b !important;
 }
