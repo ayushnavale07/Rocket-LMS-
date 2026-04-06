@@ -351,19 +351,19 @@ const Courses = () => {
                         </div>
                     </div>
                     <div className="courses-grid mt-5">
-                        {(showAllDiscounted ? discountedCoursesArr : discountedCoursesArr.slice(0, 3)).map(course => (
-                            <div className="course-card white-bg" key={course.id} onClick={() => handlePurchase(course.id)}>
+                        {(showAllDiscounted ? courses : courses.slice(0, 3)).map(course => (
+                            <div className="course-card white-bg" key={course._id} onClick={() => handlePurchase(course._id)}>
                                 <div className="course-thumb">
                                     <img src={course.image} alt={course.title} />
-                                    <span className="promo-badge">{course.discount} Off</span>
+                                    {course.originalPrice > course.price && <span className="promo-badge">On Sale</span>}
                                 </div>
                                 <div className="course-info">
                                     <h3>{course.title}</h3>
-                                    <div className="stars">{"⭐".repeat(course.rating)} ({course.id % 5 + 1})</div>
-                                    <div className="instructor">👤 {course.tutor}</div>
+                                    <div className="stars">{"⭐".repeat(Math.round(course.rating))} ({course.students || 120})</div>
+                                    <div className="instructor">👤 {course.instructor}</div>
                                     <div className="course-footer">
                                         <div className="price">
-                                            ${course.price} <span className="old-price">${course.oldPrice}</span>
+                                            ${course.price} {course.originalPrice && <span className="old-price">${course.originalPrice}</span>}
                                         </div>
                                         <div className="duration">🕒 {course.duration}</div>
                                     </div>
@@ -385,15 +385,15 @@ const Courses = () => {
                     <h2 className="font-outfit text-white text-center mb-3">Free Courses</h2>
                     <p className="text-white text-center opacity-75 mb-5">Access top-quality free courses anytime, expand your skills, and learn without spending a single dollar</p>
                     <div className="courses-grid">
-                        {(showAllFree ? freeCoursesArr : freeCoursesArr.slice(0, 3)).map(course => (
-                            <div className="course-card white-bg" key={course.id} onClick={() => handlePurchase(course.id)}>
+                        {(showAllFree ? courses : courses.slice(1, 4)).map(course => (
+                            <div className="course-card white-bg" key={course._id} onClick={() => handlePurchase(course._id)}>
                                 <div className="course-thumb">
                                     <img src={course.image} alt={course.title} />
                                 </div>
                                 <div className="course-info">
                                     <h3>{course.title}</h3>
-                                    <div className="stars">{"⭐".repeat(course.rating)} (1)</div>
-                                    <div className="instructor">👤 {course.tutor}</div>
+                                    <div className="stars">{"⭐".repeat(Math.round(course.rating))} ({course.students || 85})</div>
+                                    <div className="instructor">👤 {course.instructor}</div>
                                     <div className="course-footer">
                                         <div className="price text-success">Free</div>
                                         <div className="duration">🕒 {course.duration}</div>
