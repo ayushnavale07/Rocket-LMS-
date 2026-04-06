@@ -13,7 +13,7 @@ const AdminDashboard = () => {
 
     useEffect(() => {
         const fetchCourses = async () => {
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/courses`);
+            const res = await axios.get(`${API_BASE_URL}/api/courses`);
             setCourses(res.data);
         };
         fetchCourses();
@@ -23,8 +23,8 @@ const AdminDashboard = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/courses/seed`, [newCourse]);
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/courses`);
+            await axios.post(`${API_BASE_URL}/api/courses/seed`, [newCourse]);
+            const res = await axios.get(`${API_BASE_URL}/api/courses`);
             setCourses(res.data);
             setNewCourse({ title: '', price: '', image: '', category: 'Design', instructor: 'Admin' });
             alert("Course added successfully!");
