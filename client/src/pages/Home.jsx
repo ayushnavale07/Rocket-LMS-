@@ -104,7 +104,7 @@ const Home = () => {
 
         const fetchReviews = async () => {
             try {
-                const res = await axios.get('http://localhost:5000/api/reviews?type=website');
+                const res = await axios.get(`${API_BASE_URL}/api/reviews?type=website`);
                 setWebsiteReviews(res.data);
             } catch (err) {
                 console.error("Error fetching reviews", err);

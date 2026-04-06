@@ -60,7 +60,7 @@ const Courses = () => {
     useEffect(() => {
         const fetchCourses = async () => {
             try {
-                const res = await axios.get('http://localhost:5000/api/courses');
+                const res = await axios.get(`${API_BASE_URL}/api/courses`);
                 const allFetched = res.data;
                 const regular = allFetched.filter(c => !c.isUpcoming);
                 const upcoming = allFetched.filter(c => c.isUpcoming);
@@ -130,44 +130,54 @@ const Courses = () => {
             return;
         }
 
+        const token = localStorage.getItem('token');
         try {
-            // Step 1: Initiate Order
-            const res = await axios.post('http://localhost:5000/api/payment/initiate-order',
+            const res = await axios.post(`${API_BASE_URL}/api/payment/create-order`,
                 { courseId },
-                { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+                { headers: { Authorization: `Bearer ${token}` } }
             );
+            const { orderId, amount, currency, courseTitle, userName, userEmail, razorpayKeyId } = res.data;
 
-            setCheckoutDetails({ ...res.data, courseId });
-            setShowCheckoutModal(true);
-            setPaymentSuccessData(null);
+            const script = document.createElement('script');
+            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            document.body.appendChild(script);
+            script.onload = () => {
+                const options = {
+                    key: razorpayKeyId,
+                    amount: amount,
+                    currency: currency || 'INR',
+                    name: 'Rocket LMS',
+                    description: courseTitle,
+                    order_id: orderId,
+                    handler: async (response) => {
+                        try {
+                            const verifyRes = await axios.post(`${API_BASE_URL}/api/payment/verify-payment`,
+                                {
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_payment_id: response.razorpay_payment_id,
+                                    razorpay_signature: response.razorpay_signature,
+                                    courseId: courseId
+                                },
+                                { headers: { Authorization: `Bearer ${token}` } }
+                            );
+                            setPaymentSuccessData(verifyRes.data.transaction);
+                            setShowCheckoutModal(true);
+                        } catch (err) {
+                            alert('Enrollment failed: ' + (err.response?.data?.message || 'Unknown error'));
+                        }
+                    },
+                    prefill: { name: userName, email: userEmail },
+                    theme: { color: '#3b82f6' }
+                };
+                const rzp = new window.Razorpay(options);
+                rzp.open();
+            };
         } catch (err) {
-            alert(err.response?.data?.message || 'Failed to initiate order');
+            alert(err.response?.data?.message || 'Payment initiation failed');
         }
     };
 
-    const confirmPayment = async () => {
-        setIsProcessing(true);
-        try {
-            // Simulate Payment Gateway delay
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-            // Step 2: Verify & Finalize
-            const res = await axios.post('http://localhost:5000/api/payment/verify-payment',
-                {
-                    courseId: checkoutDetails.courseId,
-                    amount: checkoutDetails.amount,
-                    transactionId: `TXN_${Math.random().toString(36).substr(2, 9).toUpperCase()}`
-                },
-                { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-            );
-
-            setPaymentSuccessData(res.data.transaction);
-            setIsProcessing(false);
-        } catch (err) {
-            setIsProcessing(false);
-            alert('Payment verification failed');
-        }
-    };
+    const confirmPayment = async () => {};
 
 
 
