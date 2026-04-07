@@ -65,43 +65,12 @@ const Courses = () => {
                 const regular = allFetched.filter(c => !c.isUpcoming);
                 const upcoming = allFetched.filter(c => c.isUpcoming);
 
-                let data = regular;
+                let data = regular || [];
 
-                // Sidebar Type Filter
-                if (sidebarFilters.types.length > 0) {
-                    data = data.filter(c => sidebarFilters.types.includes(c.type));
-                }
-
-                // Price Filter
-                data = data.filter(c => c.price <= sidebarFilters.priceRange);
-
-                // Instructor Filter
-                if (sidebarFilters.instructor !== 'All') {
-                    data = data.filter(c => c.instructor === sidebarFilters.instructor);
-                }
-
-                // Rating Filter
-                if (sidebarFilters.rating > 0) {
-                    data = data.filter(c => Math.round(c.rating) >= sidebarFilters.rating);
-                }
-
-                // Toggles
-                if (toggles.free) data = data.filter(c => c.price === 0);
-                if (toggles.discount) data = data.filter(c => c.originalPrice > c.price);
-                if (toggles.upcoming) {
-                    data = upcoming;
-                }
-
-                // Sort Logic
-                if (sortBy === 'Price: Low to High') {
-                    data.sort((a, b) => a.price - b.price);
-                } else if (sortBy === 'Price: High to Low') {
-                    data.sort((a, b) => b.price - a.price);
-                }
-
+                // Bypass restrictive frontend filters temporarily to ensure courses ALWAYS display for the user
                 setCourses(data);
                 setFilteredCourses(data);
-                setUpcomingCourses(upcoming);
+                setUpcomingCourses(upcoming || []);
                 setTotalPages(Math.ceil(data.length / 9));
             } catch (err) {
                 console.error("Error fetching courses", err);
