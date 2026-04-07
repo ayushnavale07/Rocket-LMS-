@@ -254,45 +254,47 @@ const Courses = () => {
                 </aside>
 
                 <section className="course-list">
-                    <div className="course-grid">
+                    <div className="courses-grid mt-5">
                         {loading ? (
                             <p>Loading...</p>
                         ) : (
                             filteredCourses.slice((page - 1) * 9, page * 9).map(course => (
-                                <div className="course-card-premium" key={course._id}>
-                                    <div className="course-thumb">
-                                        <img src={course.image} alt={course.title} />
-                                        <div className="overlay-badge">
-                                            {course.type === 'Text Lesson' ? (
-                                                <span className="badge-icon light-blue">📄</span>
-                                            ) : course.type === 'Live Class' ? (
-                                                <span className="badge-icon light-red">📹</span>
-                                            ) : (
-                                                <span className="badge-icon light-green">🎥</span>
-                                            )}
+                                <div className="course-card white-bg ModernMockupStyle" key={course._id} style={{ border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', borderRadius: '24px', overflow: 'hidden', padding: '0', cursor: 'pointer', transition: '0.3s' }}>
+                                    
+                                    {/* Mockup Graphic Top Area */}
+                                    <div style={{ background: '#f8fafc', height: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                                        {/* Pure CSS Round Vector Icon Mock */}
+                                        <div style={{ width: '100px', height: '100px', borderRadius: '50%', background: 'white', border: '3px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 20px rgba(0,0,0,0.05)', position: 'relative' }}>
+                                           <span style={{ fontSize: '2.5rem', fontWeight: '900', color: '#1e293b' }}>
+                                                {course.title.includes('Node') ? 'JS' : course.title.includes('React') ? '⚛️' : course.title.includes('Python') ? '🐍' : course.title.includes('UI') ? '🎨' : '📚'}
+                                           </span>
                                         </div>
                                     </div>
-                                    <div className="course-info">
-                                        <h3 className="course-title-main">{course.title}</h3>
-                                        <div className="stars">
-                                            {[...Array(5)].map((_, i) => (
-                                                <span key={i} className={i < Math.round(course.rating || 5) ? "star-active" : "star-inactive"}>⭐</span>
-                                            ))}
-                                        </div>
-                                        <div className="instructor-meta">
-                                            <span className="icon">👤</span> {course.instructor} <span className="cat-text">in {course.category}</span>
-                                        </div>
-                                        <div className="course-card-footer">
-                                            <div className="price-section">
-                                                <span className="current-price">${course.price}</span>
-                                                {course.originalPrice > course.price && <span className="discounted-price">${course.originalPrice}</span>}
+
+                                    <div className="course-info" style={{ padding: '30px' }}>
+                                        <h3 style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a', marginBottom: '20px', minHeight: '3rem' }}>{course.title}</h3>
+                                        
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '25px' }}>
+                                            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#e2e8f0', overflow: 'hidden' }}>
+                                                <img src={`https://ui-avatars.com/api/?name=${course.instructor.split(' ').join('+')}&background=random`} alt={course.instructor} style={{ width: '100%', height: '100%' }} />
                                             </div>
-                                            <div className="duration-info">
-                                                <span>🕒 {course.duration}</span>
+                                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                <strong style={{ fontSize: '0.95rem', color: '#1e293b' }}>{course.instructor}</strong>
+                                                <span style={{ fontSize: '0.85rem', color: '#64748b' }}>in {course.category}</span>
                                             </div>
                                         </div>
-                                        <div style={{ marginTop: '15px' }}>
-                                            <button className="btn btn-primary w-100" onClick={() => handlePurchase(course._id)} style={{ padding: '8px', fontSize: '0.9rem', borderRadius: '6px' }}>💳 Buy Now with Razorpay</button>
+                                        
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '20px', borderTop: '1px solid #f1f5f9' }}>
+                                            <div style={{ fontSize: '1.3rem', fontWeight: '800', color: '#1a73e8' }}>
+                                                ${course.price}
+                                            </div>
+                                            <div style={{ fontSize: '0.9rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                                <span>🕒</span> {course.duration || '3:00 Hours'}
+                                            </div>
+                                        </div>
+
+                                        <div style={{ marginTop: '20px' }}>
+                                            <button className="btn btn-primary w-100" onClick={() => handlePurchase(course._id)} style={{ padding: '12px', fontSize: '1rem', borderRadius: '12px', fontWeight: '700' }}>💳 Buy Now with Razorpay</button>
                                         </div>
                                     </div>
                                 </div>
