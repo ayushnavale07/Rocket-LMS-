@@ -227,7 +227,17 @@ const Courses = () => {
                         {loading ? (
                             <p>Loading...</p>
                         ) : (
-                            filteredCourses.slice((page - 1) * 9, page * 9).map(course => (
+                            [
+                                { _id: '101', title: "Web Development Course", instructor: "Kate Williams", price: 25, duration: "3:10 Hours", category: "Web Development" },
+                                { _id: '102', title: "AWS Cloud Expert", instructor: "Robert Ransdell", price: 80, duration: "6:20 Hours", category: "Technology" },
+                                { _id: '103', title: "Graphic Designing Course", instructor: "Affogato Media", price: 40, duration: "5:00 Hours", category: "Design" },
+                                { _id: '104', title: "Java Full Stack Course", instructor: "James Kong", price: 90, duration: "10:40 Hours", category: "Web Development" },
+                                { _id: '105', title: "MS Office Masterclass", instructor: "Ricardo Dave", price: 15, duration: "2:00 Hours", category: "Management" },
+                                { _id: '106', title: "App Development Course", instructor: "John Powe", price: 60, duration: "4:50 Hours", category: "Technology" },
+                                { _id: '107', title: "WordPress Complete Guide", instructor: "Linda Anderson", price: 20, duration: "2:40 Hours", category: "Web Development" },
+                                { _id: '108', title: "UI/UX Design Bootcamp", instructor: "Jessica Wray", price: 55, duration: "8:00 Hours", category: "Design" },
+                                { _id: '109', title: "Python Data Science", instructor: "Kate Williams", price: 45, duration: "6:00 Hours", category: "Science" }
+                            ].map(course => (
                                 <div className="course-card white-bg ModernMockupStyle" key={course._id} style={{ border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', borderRadius: '24px', overflow: 'hidden', padding: '0', cursor: 'pointer', transition: '0.3s' }}>
                                     
                                     {/* Mockup Graphic Top Area */}
