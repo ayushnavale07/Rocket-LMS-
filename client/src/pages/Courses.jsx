@@ -102,7 +102,7 @@ const Courses = () => {
                 setCourses(data);
                 setFilteredCourses(data);
                 setUpcomingCourses(upcoming);
-                setTotalPages(Math.ceil(data.length / 6));
+                setTotalPages(Math.ceil(data.length / 9));
             } catch (err) {
                 console.error("Error fetching courses", err);
             } finally {
@@ -258,7 +258,7 @@ const Courses = () => {
                         {loading ? (
                             <p>Loading...</p>
                         ) : (
-                            filteredCourses.slice((page - 1) * 6, page * 6).map(course => (
+                            filteredCourses.slice((page - 1) * 9, page * 9).map(course => (
                                 <div className="course-card-premium" key={course._id}>
                                     <div className="course-thumb">
                                         <img src={course.image} alt={course.title} />
