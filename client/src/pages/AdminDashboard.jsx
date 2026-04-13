@@ -3,6 +3,7 @@ import axios from 'axios';
 import API_BASE_URL from '../api/config';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { LayoutDashboard, BookOpen, CreditCard, FileText, Plus, Edit2, Trash2, X, Loader2 } from 'lucide-react';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
@@ -25,19 +26,17 @@ const AdminDashboard = () => {
     const fetchData = async () => {
         setLoading(true);
         try {
-            // Fetch courses separately so one failing doesn't block the other
+            // Courses
             try {
-                const coursesRes = await axios.get(`${API_BASE_URL}/api/courses`);
-                setCourses(coursesRes.data);
-            } catch (e) { console.error("Courses fetch failed", e); }
+                const res = await axios.get(`${API_BASE_URL}/api/courses`);
+                setCourses(res.data);
+            } catch (e) { console.error("Courses fail", e); }
 
+            // Stats
             try {
-                const statsRes = await axios.get(`${API_BASE_URL}/api/admin/stats`);
-                setStats(statsRes.data);
-            } catch (e) { console.error("Stats fetch failed - Backend might not be updated yet.", e); }
-            
-        } catch (err) {
-            console.error("Data fetch error", err);
+                const res = await axios.get(`${API_BASE_URL}/api/admin/stats`);
+                setStats(res.data);
+            } catch (e) { console.error("Stats fail", e); }
         } finally {
             setLoading(false);
         }
@@ -49,27 +48,25 @@ const AdminDashboard = () => {
         try {
             if (editingCourse) {
                 await axios.put(`${API_BASE_URL}/api/courses/${editingCourse._id}`, formData);
-                alert("Course updated successfully!");
             } else {
                 await axios.post(`${API_BASE_URL}/api/courses`, formData);
-                alert("Course added successfully!");
             }
             setShowModal(false);
             setEditingCourse(null);
             setFormData({ title: '', price: '', image: '', category: 'Design', instructor: 'Admin', description: '' });
             fetchData();
+            alert(editingCourse ? "Updated!" : "Created!");
         } catch (err) {
-            alert("Operation failed: " + (err.response?.data?.message || err.message));
+            alert("Error: " + err.message);
         } finally {
             setLoading(false);
         }
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this course?")) return;
+        if (!window.confirm("Delete this course?")) return;
         try {
             await axios.delete(`${API_BASE_URL}/api/courses/${id}`);
-            alert("Course deleted");
             fetchData();
         } catch (err) {
             alert("Delete failed");
@@ -90,150 +87,134 @@ const AdminDashboard = () => {
     };
 
     if (!user || user.role !== 'admin') {
-        return <div className="p-5 text-center"><h2>Access Denied. Admins Only.</h2></div>;
+        return <div style={{padding: '4rem', textAlign: 'center'}}><h2>Access Denied</h2></div>;
     }
 
     return (
         <div className="admin-page">
             <Navbar />
-            <div className="container-fluid">
-                <div className="row">
-                    {/* Sidebar */}
-                    <div className="col-lg-2 admin-sidebar">
-                        <div className="admin-nav-list">
-                            <div className={`admin-nav-item ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>
-                                📊 Overview
-                            </div>
-                            <div className={`admin-nav-item ${activeTab === 'courses' ? 'active' : ''}`} onClick={() => setActiveTab('courses')}>
-                                📚 Courses
-                            </div>
-                            <div className={`admin-nav-item ${activeTab === 'payments' ? 'active' : ''}`} onClick={() => setActiveTab('payments')}>
-                                💰 Payments
-                            </div>
-                            <div className={`admin-nav-item ${activeTab === 'content' ? 'active' : ''}`} onClick={() => setActiveTab('content')}>
-                                📝 Content
-                            </div>
+            
+            <div className="admin-container">
+                {/* Sidebar */}
+                <aside className="admin-sidebar">
+                    <nav className="admin-nav-list">
+                        <div className={`admin-nav-item ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>
+                            <LayoutDashboard size={20} /> Overview
                         </div>
-                    </div>
-
-                    {/* Main Content */}
-                    <div className="col-lg-10 p-4">
-                        <div className="d-flex justify-content-between align-items-center mb-4">
-                            <h1 className="font-outfit">Admin Panel - {activeTab.toUpperCase()}</h1>
-                            {activeTab === 'courses' && (
-                                <button className="btn btn-primary" onClick={() => { setEditingCourse(null); setFormData({ title: '', price: '', image: '', category: 'Design', instructor: 'Admin', description: '' }); setShowModal(true); }}>
-                                    + Add New Course
-                                </button>
-                            )}
+                        <div className={`admin-nav-item ${activeTab === 'courses' ? 'active' : ''}`} onClick={() => setActiveTab('courses')}>
+                            <BookOpen size={20} /> Courses
                         </div>
+                        <div className={`admin-nav-item ${activeTab === 'payments' ? 'active' : ''}`} onClick={() => setActiveTab('payments')}>
+                            <CreditCard size={20} /> Payments
+                        </div>
+                        <div className={`admin-nav-item ${activeTab === 'content' ? 'active' : ''}`} onClick={() => setActiveTab('content')}>
+                            <FileText size={20} /> Content
+                        </div>
+                    </nav>
+                </aside>
 
-                        {loading && <div className="text-center py-5"><h4>🔄 Fetching latest data...</h4></div>}
-
-                        {activeTab === 'overview' && (
-                            <div className="row g-4">
-                                <div className="col-md-3">
-                                    <div className="stat-card blue">
-                                        <span className="label">Total Revenue</span>
-                                        <span className="value">₹{stats.revenue}</span>
-                                    </div>
-                                </div>
-                                <div className="col-md-3">
-                                    <div className="stat-card green">
-                                        <span className="label">Students</span>
-                                        <span className="value">{stats.students}</span>
-                                    </div>
-                                </div>
-                                <div className="col-md-3">
-                                    <div className="stat-card purple">
-                                        <span className="label">Active Courses</span>
-                                        <span className="value">{stats.courses}</span>
-                                    </div>
-                                </div>
-                                <div className="col-md-3">
-                                    <div className="stat-card orange">
-                                        <span className="label">Total Enrollments</span>
-                                        <span className="value">{stats.enrollments}</span>
-                                    </div>
-                                </div>
-
-                                <div className="col-md-8">
-                                    <div className="admin-card">
-                                        <h4 className="mb-3">Recent Transactions</h4>
-                                        <div className="table-responsive">
-                                            <table className="admin-table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>User</th>
-                                                        <th>Course</th>
-                                                        <th>Amount</th>
-                                                        <th>Date</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {stats.recentPayments.map(p => (
-                                                        <tr key={p._id}>
-                                                            <td>{p.user?.name || 'Unknown'}</td>
-                                                            <td>{p.course?.title}</td>
-                                                            <td>₹{p.amount}</td>
-                                                            <td>{new Date(p.createdAt).toLocaleDateString()}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-md-4">
-                                    <div className="admin-card">
-                                        <h4 className="mb-3">Categories Distribution</h4>
-                                        {stats.categoryStats.map(c => (
-                                            <div key={c._id} className="d-flex justify-content-between mb-2">
-                                                <span>{c._id}</span>
-                                                <span className="badge bg-primary rounded-pill">{c.count}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
+                {/* Main Content */}
+                <main className="admin-main">
+                    <header className="admin-header">
+                        <h1 className="admin-title">{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</h1>
                         {activeTab === 'courses' && (
+                            <button className="btn-primary" onClick={() => { setEditingCourse(null); setFormData({ title: '', price: '', image: '', category: 'Design', instructor: 'Admin', description: '' }); setShowModal(true); }}>
+                                <Plus size={18} style={{marginRight: '0.5rem'}} /> Add Course
+                            </button>
+                        )}
+                    </header>
+
+                    {loading && (
+                        <div style={{display: 'flex', justifyContent: 'center', padding: '4rem'}}>
+                            <Loader2 className="animate-spin" size={40} />
+                        </div>
+                    )}
+
+                    {!loading && activeTab === 'overview' && (
+                        <>
+                            <div className="stats-grid">
+                                <div className="stat-card">
+                                    <div className="stat-value">₹{stats.revenue}</div>
+                                    <div className="stat-label">Total Revenue</div>
+                                </div>
+                                <div className="stat-card">
+                                    <div className="stat-value">{stats.students}</div>
+                                    <div className="stat-label">Students</div>
+                                </div>
+                                <div className="stat-card">
+                                    <div className="stat-value">{stats.courses}</div>
+                                    <div className="stat-label">Active Courses</div>
+                                </div>
+                                <div className="stat-card">
+                                    <div className="stat-value">{stats.enrollments}</div>
+                                    <div className="stat-label">Enrollments</div>
+                                </div>
+                            </div>
+
                             <div className="admin-card">
-                                <div className="table-responsive">
+                                <h3 style={{marginBottom: '1rem'}}>Recent Transactions</h3>
+                                <div className="table-container">
                                     <table className="admin-table">
                                         <thead>
                                             <tr>
-                                                <th>Image</th>
-                                                <th>Title</th>
-                                                <th>Price</th>
-                                                <th>Category</th>
-                                                <th>Actions</th>
+                                                <th>Student</th>
+                                                <th>Course</th>
+                                                <th>Amount</th>
+                                                <th>Date</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {courses.map(c => (
-                                                <tr key={c._id}>
-                                                    <td><img src={c.image} alt="" style={{ width: '50px', borderRadius: '4px' }} /></td>
-                                                    <td className="fw-bold">{c.title}</td>
-                                                    <td>₹{c.price}</td>
-                                                    <td>{c.category}</td>
-                                                    <td>
-                                                        <button className="action-btn" onClick={() => openEditModal(c)}>✏️</button>
-                                                        <button className="action-btn delete" onClick={() => handleDelete(c._id)}>🗑️</button>
-                                                    </td>
+                                            {stats.recentPayments.map(p => (
+                                                <tr key={p._id}>
+                                                    <td>{p.user?.name || 'User'}</td>
+                                                    <td>{p.course?.title}</td>
+                                                    <td>₹{p.amount}</td>
+                                                    <td>{new Date(p.createdAt).toLocaleDateString()}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
-                        )}
+                        </>
+                    )}
 
-                        {activeTab === 'payments' && (
-                            <div className="admin-card">
-                                <h4>Full Transaction History</h4>
-                                <p className="text-muted">Detailed view of all payments and revenue streams.</p>
-                                {/* Similar table to recent transactions but with more detail or pagination */}
+                    {!loading && activeTab === 'courses' && (
+                        <div className="admin-card">
+                            <div className="table-container">
+                                <table className="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Image</th>
+                                            <th>Title</th>
+                                            <th>Category</th>
+                                            <th>Price</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {courses.map(c => (
+                                            <tr key={c._id}>
+                                                <td><img src={c.image} alt="" style={{width: '60px', height: '40px', objectFit: 'cover', borderRadius: '4px'}} /></td>
+                                                <td style={{fontWeight: '600'}}>{c.title}</td>
+                                                <td>{c.category}</td>
+                                                <td>₹{c.price}</td>
+                                                <td>
+                                                    <button className="btn-icon" onClick={() => openEditModal(c)}><Edit2 size={16} /></button>
+                                                    <button className="btn-icon delete" onClick={() => handleDelete(c._id)}><Trash2 size={16} /></button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+
+                    {!loading && activeTab === 'payments' && (
+                         <div className="admin-card">
+                            <h3 style={{marginBottom: '1rem'}}>Transaction History</h3>
+                            <div className="table-container">
                                 <table className="admin-table">
                                     <thead>
                                         <tr>
@@ -246,67 +227,60 @@ const AdminDashboard = () => {
                                     <tbody>
                                         {stats.recentPayments.map(p => (
                                             <tr key={p._id}>
-                                                <td><code>{p._id}</code></td>
+                                                <td><code style={{fontSize: '0.8rem'}}>{p._id}</code></td>
                                                 <td>{p.user?.name}</td>
                                                 <td>₹{p.amount}</td>
-                                                <td><span className="badge bg-success">Completed</span></td>
+                                                <td><span style={{background: '#dcfce7', color: '#166534', padding: '0.25rem 0.5rem', borderRadius: '1rem', fontSize: '0.75rem', fontWeight: 'bold'}}>Paid</span></td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
                             </div>
-                        )}
+                         </div>
+                    )}
 
-                        {activeTab === 'content' && (
-                            <div className="admin-card text-center py-5">
-                                <h3>🚀 Content Management System</h3>
-                                <p>This section is for managing lessons, uploading videos, and resources.</p>
-                                <button className="btn btn-outline-primary mt-3">Upload Video Lesson</button>
-                                <button className="btn btn-outline-secondary mt-3 ms-2">Manage Resources</button>
-                            </div>
-                        )}
-                    </div>
-                </div>
+                    {!loading && activeTab === 'content' && (
+                        <div className="admin-card" style={{textAlign: 'center', padding: '4rem'}}>
+                            <h3>📝 Content Management</h3>
+                            <p style={{color: '#64748b'}}>Manage lessons, videos and course resources here.</p>
+                            <button className="btn-primary" style={{marginTop: '1rem'}}>Create New Lesson</button>
+                        </div>
+                    )}
+                </main>
             </div>
 
-            {/* Modal for Add/Edit */}
             {showModal && (
-                <div className="course-modal-overlay">
-                    <div className="course-modal">
-                        <h3>{editingCourse ? 'Edit Course' : 'Add New Course'}</h3>
-                        <form onSubmit={handleCreateOrUpdate} className="mt-4">
-                            <div className="mb-3">
-                                <label className="form-label">Course Title</label>
-                                <input type="text" className="form-control" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} required />
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <header style={{display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem'}}>
+                            <h3>{editingCourse ? 'Edit Course' : 'Create Course'}</h3>
+                            <X size={24} style={{cursor: 'pointer'}} onClick={() => setShowModal(false)} />
+                        </header>
+                        <form onSubmit={handleCreateOrUpdate}>
+                            <div style={{marginBottom: '1rem'}}>
+                                <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '500'}}>Title</label>
+                                <input type="text" style={{width: '100%', padding: '0.625rem', border: '1px solid #e2e8f0', borderRadius: '0.5rem'}} value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} required />
                             </div>
-                            <div className="mb-3">
-                                <label className="form-label">Price (₹)</label>
-                                <input type="number" className="form-control" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} required />
+                            <div style={{marginBottom: '1rem'}}>
+                                <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '500'}}>Price (₹)</label>
+                                <input type="number" style={{width: '100%', padding: '0.625rem', border: '1px solid #e2e8f0', borderRadius: '0.5rem'}} value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} required />
                             </div>
-                            <div className="mb-3">
-                                <label className="form-label">Image URL</label>
-                                <input type="text" className="form-control" value={formData.image} onChange={e => setFormData({...formData, image: e.target.value})} required />
-                            </div>
-                            <div className="mb-3">
-                                <label className="form-label">Category</label>
-                                <select className="form-control" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
+                            <div style={{marginBottom: '1rem'}}>
+                                <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '500'}}>Category</label>
+                                <select style={{width: '100%', padding: '0.625rem', border: '1px solid #e2e8f0', borderRadius: '0.5rem'}} value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
                                     <option>Design</option>
                                     <option>Web Development</option>
                                     <option>Technology</option>
-                                    <option>Management</option>
                                     <option>Marketing</option>
                                 </select>
                             </div>
-                            <div className="mb-3">
-                                <label className="form-label">Description</label>
-                                <textarea className="form-control" rows="3" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})}></textarea>
+                            <div style={{marginBottom: '1.5rem'}}>
+                                <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '500'}}>Image URL</label>
+                                <input type="text" style={{width: '100%', padding: '0.625rem', border: '1px solid #e2e8f0', borderRadius: '0.5rem'}} value={formData.image} onChange={e => setFormData({...formData, image: e.target.value})} required />
                             </div>
-                            <div className="d-flex justify-content-end gap-2 mt-4">
-                                <button type="button" className="btn btn-light" onClick={() => setShowModal(false)} disabled={loading}>Cancel</button>
-                                <button type="submit" className="btn btn-primary" disabled={loading}>
-                                    {loading ? 'Saving...' : (editingCourse ? 'Update Course' : 'Create Course')}
-                                </button>
-                            </div>
+                            <button className="btn-primary" style={{width: '100%'}} type="submit" disabled={loading}>
+                                {loading ? 'Saving...' : 'Save Course'}
+                            </button>
                         </form>
                     </div>
                 </div>
