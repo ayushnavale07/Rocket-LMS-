@@ -25,12 +25,17 @@ const AdminDashboard = () => {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const [coursesRes, statsRes] = await Promise.all([
-                axios.get(`${API_BASE_URL}/api/courses`),
-                axios.get(`${API_BASE_URL}/api/admin/stats`)
-            ]);
-            setCourses(coursesRes.data);
-            setStats(statsRes.data);
+            // Fetch courses separately so one failing doesn't block the other
+            try {
+                const coursesRes = await axios.get(`${API_BASE_URL}/api/courses`);
+                setCourses(coursesRes.data);
+            } catch (e) { console.error("Courses fetch failed", e); }
+
+            try {
+                const statsRes = await axios.get(`${API_BASE_URL}/api/admin/stats`);
+                setStats(statsRes.data);
+            } catch (e) { console.error("Stats fetch failed - Backend might not be updated yet.", e); }
+            
         } catch (err) {
             console.error("Data fetch error", err);
         } finally {
@@ -122,7 +127,9 @@ const AdminDashboard = () => {
                             )}
                         </div>
 
-                        {activeTab === 'overview' && (
+                        {loading && <div className="text-center py-5"><h4>🔄 Fetching latest data...</h4></div>}
+
+                        {!loading && activeTab === 'overview' && (
                             <div className="row g-4">
                                 <div className="col-md-3">
                                     <div className="stat-card blue">
@@ -190,7 +197,7 @@ const AdminDashboard = () => {
                             </div>
                         )}
 
-                        {activeTab === 'courses' && (
+                        {!loading && activeTab === 'courses' && (
                             <div className="admin-card">
                                 <div className="table-responsive">
                                     <table className="admin-table">
@@ -222,7 +229,7 @@ const AdminDashboard = () => {
                             </div>
                         )}
 
-                        {activeTab === 'payments' && (
+                        {!loading && activeTab === 'payments' && (
                             <div className="admin-card">
                                 <h4>Full Transaction History</h4>
                                 <p className="text-muted">Detailed view of all payments and revenue streams.</p>
@@ -250,7 +257,7 @@ const AdminDashboard = () => {
                             </div>
                         )}
 
-                        {activeTab === 'content' && (
+                        {!loading && activeTab === 'content' && (
                             <div className="admin-card text-center py-5">
                                 <h3>🚀 Content Management System</h3>
                                 <p>This section is for managing lessons, uploading videos, and resources.</p>
