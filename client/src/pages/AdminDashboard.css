@@ -1,79 +1,141 @@
 .admin-page {
-    background: #f8fafc;
+    background-color: #f8fafc;
     min-height: 100vh;
 }
 
-.admin-grid {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 40px;
-    margin-top: 30px;
-}
-
-.admin-form-section, .courses-list-section {
+.admin-sidebar {
     background: white;
-    padding: 30px;
-    border-radius: 24px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border-right: 1px solid #e2e8f0;
+    padding: 2rem 1rem;
+    height: calc(100vh - 80px);
+    position: sticky;
+    top: 80px;
 }
 
-.admin-form {
+.admin-nav-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.admin-nav-item:hover, .admin-nav-item.active {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.admin-nav-item i {
+    margin-right: 0.75rem;
+    font-size: 1.25rem;
+}
+
+.admin-card {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    padding: 1.5rem;
+    height: 100%;
+}
+
+.stat-card {
+    padding: 1.5rem;
+    border-radius: 1rem;
+    color: white;
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    margin-top: 20px;
 }
 
-.admin-form input, .admin-form select {
-    padding: 12px 16px;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    font-size: 1rem;
-}
+.stat-card.blue { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+.stat-card.green { background: linear-gradient(135deg, #10b981, #059669); }
+.stat-card.purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+.stat-card.orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
 
-.admin-table-wrapper {
-    margin-top: 20px;
-    overflow-x: auto;
-}
+.stat-card .value { font-size: 2rem; font-weight: 700; margin: 0.5rem 0; }
+.stat-card .label { opacity: 0.9; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; }
 
 .admin-table {
     width: 100%;
     border-collapse: collapse;
 }
 
-.admin-table th, .admin-table td {
-    padding: 15px;
-    text-align: left;
-    border-bottom: 1px solid #f1f5f9;
-}
-
 .admin-table th {
-    color: #64748b;
-    font-weight: 600;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-}
-
-.btn-icon {
     background: #f1f5f9;
+    padding: 1rem;
+    text-align: left;
+    color: #475569;
+    font-weight: 600;
+}
+
+.admin-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: #1e293b;
+}
+
+.admin-table tr:hover {
+    background: #f8fafc;
+}
+
+.action-btn {
+    padding: 0.5rem;
+    border-radius: 0.375rem;
     border: none;
-    padding: 8px;
-    border-radius: 8px;
     cursor: pointer;
-    margin-right: 8px;
-    transition: 0.2s;
+    transition: all 0.2s;
+    background: #f1f5f9;
+    margin-right: 0.5rem;
 }
 
-.btn-icon:hover {
-    background: #e2e8f0;
+.action-btn:hover { background: #e2e8f0; }
+.action-btn.delete:hover { background: #fee2e2; color: #dc2626; }
+
+.course-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
 }
 
-.btn-icon.delete:hover {
-    background: #fee2e2;
+.course-modal {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 @media (max-width: 992px) {
-    .admin-grid {
-        grid-template-columns: 1fr;
+    .admin-sidebar {
+        height: auto;
+        position: relative;
+        top: 0;
+        border-right: none;
+        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 1.5rem;
+    }
+    
+    .admin-nav-list {
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+    }
+    
+    .admin-nav-item {
+        white-space: nowrap;
+        margin-right: 1rem;
+        margin-bottom: 0;
     }
 }

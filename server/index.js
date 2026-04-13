@@ -36,6 +36,7 @@ const forumRoutes = require('./routes/forum');
 const reviewRoutes = require('./routes/review');
 const aiRoutes = require('./routes/ai');
 const newsletterRoutes = require('./routes/newsletter');
+const adminRoutes = require('./routes/admin');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/courses', coursesRoutes);
@@ -44,6 +45,7 @@ app.use('/api/forum', forumRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/newsletter', newsletterRoutes);
+app.use('/api/admin', adminRoutes);
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/rocket-lms')
     .then(() => console.log('✅ Connected to MongoDB Atlas'))

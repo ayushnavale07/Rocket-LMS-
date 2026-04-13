@@ -65,4 +65,35 @@ router.get('/enrolled/:userId', async (req, res) => {
     }
 });
 
+// Create a single course
+router.post('/', async (req, res) => {
+    try {
+        const newCourse = new Course(req.body);
+        await newCourse.save();
+        res.status(201).json(newCourse);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error: ' + error.message });
+    }
+});
+
+// Update a course
+router.put('/:id', async (req, res) => {
+    try {
+        const updatedCourse = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.json(updatedCourse);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error: ' + error.message });
+    }
+});
+
+// Delete a course
+router.delete('/:id', async (req, res) => {
+    try {
+        await Course.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Course deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error: ' + error.message });
+    }
+});
+
 module.exports = router;
