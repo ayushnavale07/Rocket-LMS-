@@ -129,7 +129,7 @@ const AdminDashboard = () => {
 
                         {loading && <div className="text-center py-5"><h4>🔄 Fetching latest data...</h4></div>}
 
-                        {!loading && activeTab === 'overview' && (
+                        {activeTab === 'overview' && (
                             <div className="row g-4">
                                 <div className="col-md-3">
                                     <div className="stat-card blue">
@@ -197,7 +197,7 @@ const AdminDashboard = () => {
                             </div>
                         )}
 
-                        {!loading && activeTab === 'courses' && (
+                        {activeTab === 'courses' && (
                             <div className="admin-card">
                                 <div className="table-responsive">
                                     <table className="admin-table">
@@ -229,7 +229,7 @@ const AdminDashboard = () => {
                             </div>
                         )}
 
-                        {!loading && activeTab === 'payments' && (
+                        {activeTab === 'payments' && (
                             <div className="admin-card">
                                 <h4>Full Transaction History</h4>
                                 <p className="text-muted">Detailed view of all payments and revenue streams.</p>
@@ -257,7 +257,7 @@ const AdminDashboard = () => {
                             </div>
                         )}
 
-                        {!loading && activeTab === 'content' && (
+                        {activeTab === 'content' && (
                             <div className="admin-card text-center py-5">
                                 <h3>🚀 Content Management System</h3>
                                 <p>This section is for managing lessons, uploading videos, and resources.</p>
