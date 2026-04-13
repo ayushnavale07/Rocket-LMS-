@@ -70,6 +70,29 @@ app.get('/api/test-deploy', (req, res) => {
     res.json({ message: "🚀 DEPLOYMENT SUCCESSFUL - V3", time: new Date().toISOString() });
 });
 
+app.get('/api/admin/seed-admin', async (req, res) => {
+    try {
+        const User = require('./models/User');
+        const bcrypt = require('bcryptjs');
+        
+        // Delete existing admin to ensure fresh credentials
+        await User.deleteOne({ email: 'admin@rocketlms.org' });
+
+        const hashedPassword = await bcrypt.hash('admin123', 10);
+        const admin = new User({
+            name: 'Admin',
+            email: 'admin@rocketlms.org',
+            password: hashedPassword,
+            role: 'admin'
+        });
+
+        await admin.save();
+        res.json({ message: "✅ Admin account created/reset: admin@rocketlms.org / admin123" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.get('/api/admin/seed-production', async (req, res) => {
     try {
         const Course = require('./models/Course');

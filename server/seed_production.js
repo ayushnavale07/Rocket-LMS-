@@ -16,6 +16,9 @@ async function seed() {
         await mongoose.connect(process.env.MONGODB_URI);
         console.log("Connected to MongoDB Atlas...");
 
+        // Delete existing admin to ensure fresh credentials
+        await User.deleteOne({ email: 'admin@rocketlms.org' });
+
         const hashedPassword = await bcrypt.hash('admin123', 10);
         const admin = new User({
             name: 'Admin',
@@ -25,14 +28,10 @@ async function seed() {
         });
 
         await admin.save();
-        console.log("✅ Admin account created: admin@rocketlms.org / admin123");
+        console.log("✅ Admin account created/reset: admin@rocketlms.org / admin123");
         process.exit();
     } catch (err) {
-        if (err.code === 11000) {
-            console.log("ℹ️ Admin account already exists.");
-        } else {
-            console.error("❌ Error seeding:", err.message);
-        }
+        console.error("❌ Error seeding:", err.message);
         process.exit(1);
     }
 }
