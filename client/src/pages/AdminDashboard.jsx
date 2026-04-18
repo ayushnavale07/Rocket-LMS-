@@ -3,7 +3,7 @@ import axios from 'axios';
 import API_BASE_URL from '../api/config';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { LayoutDashboard, BookOpen, CreditCard, FileText, Plus, Edit2, Trash2, X, Loader2 } from 'lucide-react';
+import { LayoutDashboard, BookOpen, CreditCard, FileText, Plus, Edit2, Trash2, X, Loader2, MessageSquare } from 'lucide-react';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {

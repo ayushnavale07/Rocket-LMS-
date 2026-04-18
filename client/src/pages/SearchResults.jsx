@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import API_BASE_URL from '../api/config';
 import './SearchResults.css';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -18,7 +19,7 @@ const SearchResults = () => {
         const fetchResults = async () => {
             setLoading(true);
             try {
-                const res = await axios.get(`http://localhost:5000/api/courses/search?query=${query}`);
+                const res = await axios.get(`${API_BASE_URL}/api/courses/search?query=${query}`);
                 setResults(res.data);
             } catch (err) {
                 console.error("Error fetching search results", err);

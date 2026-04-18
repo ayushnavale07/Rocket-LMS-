@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import API_BASE_URL from '../api/config';
@@ -63,8 +63,7 @@ const Events = () => {
         try {
             // Use the valid course ID as a fallback for mock items
             const targetId = courseId.startsWith('6') ? courseId : validCourseId;
-            const apiBase = import.meta.env.VITE_API_URL || 'https://rocket-lms-api-v2.loca.lt';
-            const res = await axios.post(`${apiBase}/api/payment/initiate-order`,
+            const res = await axios.post(`${API_BASE_URL}/api/payment/create-order`,
                 { courseId: targetId },
                 { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
             );
@@ -81,8 +80,7 @@ const Events = () => {
         setIsProcessing(true);
         try {
             await new Promise(resolve => setTimeout(resolve, 2000));
-            const apiBase = import.meta.env.VITE_API_URL || 'https://rocket-lms-api-v2.loca.lt';
-            const res = await axios.post(`${apiBase}/api/payment/verify-payment`,
+            const res = await axios.post(`${API_BASE_URL}/api/payment/verify-payment`,
                 {
                     courseId: checkoutDetails.courseId,
                     amount: checkoutDetails.amount,
