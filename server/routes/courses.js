@@ -2,6 +2,17 @@ const express = require('express');
 const router = express.Router();
 const Course = require('../models/Course');
 
+// Get all bundles
+router.get('/bundles', async (req, res) => {
+    try {
+        const Bundle = require('../models/Bundle');
+        const bundles = await Bundle.find().populate('courses');
+        res.json(bundles);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 // Get all courses
 router.get('/', async (req, res) => {
     try {

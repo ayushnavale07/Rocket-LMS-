@@ -4,6 +4,7 @@ const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const User = require('../models/User');
 const Course = require('../models/Course');
+const Bundle = require('../models/Bundle');
 const Payment = require('../models/Payment');
 const Enrollment = require('../models/Enrollment');
 const jwt = require('jsonwebtoken');
@@ -35,26 +36,33 @@ const verifyToken = (req, res, next) => {
 // Step 1: Create Razorpay Order
 router.post('/create-order', verifyToken, async (req, res) => {
     try {
-        const { courseId } = req.body;
-        const course = await Course.findById(courseId);
-        if (!course) return res.status(404).json({ message: 'Course not found' });
-
-        const user = await User.findById(req.userId);
-        if (user.purchasedCourses && user.purchasedCourses.includes(courseId)) {
-            return res.status(400).json({ message: 'Course already purchased' });
+        const { courseId, type } = req.body; // type can be 'course' or 'bundle'
+        let item;
+        
+        if (type === 'bundle' || (courseId && courseId.startsWith('bundle'))) {
+            // Handle legacy or specific bundle requests
+            const actualId = courseId.includes('_') ? courseId.split('_')[1] : courseId;
+            item = await Bundle.findById(actualId);
+        } else {
+            item = await Course.findById(courseId);
         }
 
+        if (!item) return res.status(404).json({ message: 'Item not found' });
+
+        const user = await User.findById(req.userId);
+        
         // Amount in paise (INR)
-        const amountInPaise = Math.round(course.price * 100);
+        const amountInPaise = Math.round(item.price * 100);
         
         const order = await razorpay.orders.create({
             amount: amountInPaise,
             currency: 'INR',
             receipt: `receipt_${Date.now()}`,
             notes: {
-                courseId: courseId,
+                itemId: item._id.toString(),
                 userId: req.userId.toString(),
-                courseName: course.title
+                itemType: type === 'bundle' ? 'bundle' : 'course',
+                itemName: item.title
             }
         });
 
@@ -62,8 +70,8 @@ router.post('/create-order', verifyToken, async (req, res) => {
             orderId: order.id,
             amount: order.amount,
             currency: order.currency,
-            courseTitle: course.title,
-            coursePrice: course.price,
+            courseTitle: item.title,
+            coursePrice: item.price,
             userName: user.name,
             userEmail: user.email,
             razorpayKeyId: process.env.RAZORPAY_KEY_ID || 'rzp_test_1DP5mmOlF5G5ag'
@@ -77,70 +85,74 @@ router.post('/create-order', verifyToken, async (req, res) => {
 // Step 2: Verify Payment & Enroll
 router.post('/verify-payment', verifyToken, async (req, res) => {
     try {
-        const { razorpay_order_id, razorpay_payment_id, razorpay_signature, courseId } = req.body;
+        const { razorpay_order_id, razorpay_payment_id, razorpay_signature, courseId, type } = req.body;
 
-        // Verify signature
+        // Verify signature (already checked logic)
         const keySecret = process.env.RAZORPAY_KEY_SECRET || 'thiswillbereplaced';
         const hmac = crypto.createHmac('sha256', keySecret);
         hmac.update(`${razorpay_order_id}|${razorpay_payment_id}`);
         const generatedSignature = hmac.digest('hex');
 
         if (generatedSignature !== razorpay_signature) {
-            return res.status(400).json({ message: 'Payment verification failed. Signature mismatch.' });
+            return res.status(400).json({ message: 'Payment verification failed.' });
         }
 
         const user = await User.findById(req.userId);
-        const course = await Course.findById(courseId);
+        let item;
+        if (type === 'bundle') {
+            item = await Bundle.findById(courseId);
+        } else {
+            item = await Course.findById(courseId);
+        }
 
         // Store Payment Record
         const payment = new Payment({
             user: req.userId,
-            course: courseId,
-            amount: course.price,
+            course: type === 'bundle' ? null : courseId,
+            bundle: type === 'bundle' ? courseId : null,
+            amount: item.price,
             transactionId: razorpay_payment_id,
             status: 'completed'
         });
         await payment.save();
 
-        // Create Enrollment
-        await Enrollment.create({ user: req.userId, course: courseId, progress: 0 });
+        // Enroll in all courses if it's a bundle
+        if (type === 'bundle') {
+            for (const cId of item.courses) {
+                await Enrollment.findOneAndUpdate(
+                    { user: req.userId, course: cId },
+                    { status: 'active', progress: 0 },
+                    { upsert: true }
+                );
+                if (!user.purchasedCourses) user.purchasedCourses = [];
+                if (!user.purchasedCourses.includes(cId)) user.purchasedCourses.push(cId);
+            }
+        } else {
+            // Create Enrollment for single course
+            await Enrollment.create({ user: req.userId, course: courseId, progress: 0 });
+            if (!user.purchasedCourses) user.purchasedCourses = [];
+            user.purchasedCourses.push(courseId);
+        }
 
-        // Update User
-        if (!user.purchasedCourses) user.purchasedCourses = [];
-        user.purchasedCourses.push(courseId);
         await user.save();
 
         // Send Email Notification
         try {
             await sendEmail({
                 email: user.email,
-                subject: `Welcome to ${course.title}!`,
-                message: `Hi ${user.name},\n\nYou have successfully enrolled in ${course.title}. You can now start learning from your dashboard.\n\nTransaction ID: ${razorpay_payment_id}\nAmount: ₹${course.price}\n\nHappy Learning!\nTeam Rocket LMS`,
-                html: `
-                    <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-                        <h2 style="color: #3b82f6;">Enrollment Successful!</h2>
-                        <p>Hi <strong>${user.name}</strong>,</p>
-                        <p>You have successfully enrolled in <strong>${course.title}</strong>.</p>
-                        <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                            <p style="margin: 5px 0;"><strong>Transaction ID:</strong> #${razorpay_payment_id}</p>
-                            <p style="margin: 5px 0;"><strong>Amount Paid:</strong> ₹${course.price}</p>
-                        </div>
-                        <p>You can now access your course from your student dashboard.</p>
-                        <a href="https://rocketlms.org/dashboard" style="display: inline-block; background: #3b82f6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-top: 10px;">Go to Dashboard</a>
-                    </div>
-                `
+                subject: `Welcome to ${item.title}!`,
+                message: `Hi ${user.name},\n\nYou have successfully enrolled in ${item.title}.`,
+                html: `<h2>Enrollment Successful!</h2><p>You now have access to <strong>${item.title}</strong>.</p>`
             });
-        } catch (emailErr) {
-            console.error("Email failed but payment succeeded", emailErr);
-        }
+        } catch (e) {}
 
         res.json({
             message: 'Enrollment successful!',
             transaction: {
                 user: user.name,
                 email: user.email,
-                course: course.title,
-                rate: course.price,
+                course: item.title,
+                rate: item.price,
                 paymentId: razorpay_payment_id,
                 date: new Date()
             }

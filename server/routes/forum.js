@@ -60,4 +60,18 @@ router.post('/topics/:id/comments', verifyToken, async (req, res) => {
     }
 });
 
+// Delete a topic (Admin only)
+router.delete('/topics/:id', verifyToken, async (req, res) => {
+    try {
+        const User = require('../models/User');
+        const user = await User.findById(req.userId);
+        if (!user || user.role !== 'admin') return res.status(403).json({ message: 'Only admins can delete topics' });
+
+        await ForumTopic.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Topic deleted' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 module.exports = router;

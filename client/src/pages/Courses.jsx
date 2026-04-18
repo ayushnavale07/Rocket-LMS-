@@ -65,13 +65,38 @@ const Courses = () => {
                 const regular = allFetched.filter(c => !c.isUpcoming);
                 const upcoming = allFetched.filter(c => c.isUpcoming);
 
-                let data = regular || [];
+                setCourses(regular);
+                setUpcomingCourses(upcoming);
+                
+                // Apply Filters
+                let filtered = [...regular];
+                
+                // Sidebar Search Toggle Filters
+                if (toggles.free) filtered = filtered.filter(c => c.price === 0);
+                if (toggles.discount) filtered = filtered.filter(c => c.originalPrice > c.price);
+                
+                // Sidebar Specific Filters
+                if (sidebarFilters.types.length > 0) {
+                    filtered = filtered.filter(c => sidebarFilters.types.includes(c.type || 'Course'));
+                }
+                
+                if (sidebarFilters.instructor !== 'All') {
+                    filtered = filtered.filter(c => c.instructor === sidebarFilters.instructor);
+                }
+                
+                filtered = filtered.filter(c => c.price <= sidebarFilters.priceRange);
+                
+                if (sidebarFilters.rating > 0) {
+                    filtered = filtered.filter(c => c.rating >= sidebarFilters.rating);
+                }
 
-                // Bypass restrictive frontend filters temporarily to ensure courses ALWAYS display for the user
-                setCourses(data);
-                setFilteredCourses(data);
-                setUpcomingCourses(upcoming || []);
-                setTotalPages(Math.ceil(data.length / 9));
+                // Sorting
+                if (sortBy === 'Price: Low to High') filtered.sort((a,b) => a.price - b.price);
+                if (sortBy === 'Price: High to Low') filtered.sort((a,b) => b.price - a.price);
+                if (sortBy === 'Newest') filtered.reverse();
+
+                setFilteredCourses(filtered);
+                setTotalPages(Math.ceil(filtered.length / 9));
             } catch (err) {
                 console.error("Error fetching courses", err);
             } finally {
@@ -226,28 +251,14 @@ const Courses = () => {
                     <div className="courses-grid mt-5">
                         {loading ? (
                             <p>Loading...</p>
+                        ) : filteredCourses.length === 0 ? (
+                            <p className="p-5 text-center text-secondary w-100">No courses found matching your criteria. Try adjusting filters!</p>
                         ) : (
-                            [
-                                { _id: '101', title: "Web Development Course", instructor: "Kate Williams", price: 25, duration: "3:10 Hours", category: "Web Development" },
-                                { _id: '102', title: "AWS Cloud Expert", instructor: "Robert Ransdell", price: 80, duration: "6:20 Hours", category: "Technology" },
-                                { _id: '103', title: "Graphic Designing Course", instructor: "Affogato Media", price: 40, duration: "5:00 Hours", category: "Design" },
-                                { _id: '104', title: "Java Full Stack Course", instructor: "James Kong", price: 90, duration: "10:40 Hours", category: "Web Development" },
-                                { _id: '105', title: "MS Office Masterclass", instructor: "Ricardo Dave", price: 15, duration: "2:00 Hours", category: "Management" },
-                                { _id: '106', title: "App Development Course", instructor: "John Powe", price: 60, duration: "4:50 Hours", category: "Technology" },
-                                { _id: '107', title: "WordPress Complete Guide", instructor: "Linda Anderson", price: 20, duration: "2:40 Hours", category: "Web Development" },
-                                { _id: '108', title: "UI/UX Design Bootcamp", instructor: "Jessica Wray", price: 55, duration: "8:00 Hours", category: "Design" },
-                                { _id: '109', title: "Python Data Science", instructor: "Kate Williams", price: 45, duration: "6:00 Hours", category: "Science" }
-                            ].map(course => (
+                            filteredCourses.map(course => (
                                 <div className="course-card white-bg ModernMockupStyle" key={course._id} style={{ border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', borderRadius: '24px', overflow: 'hidden', padding: '0', cursor: 'pointer', transition: '0.3s' }}>
                                     
-                                    {/* Mockup Graphic Top Area */}
-                                    <div style={{ background: '#f8fafc', height: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                                        {/* Pure CSS Round Vector Icon Mock */}
-                                        <div style={{ width: '100px', height: '100px', borderRadius: '50%', background: 'white', border: '3px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 20px rgba(0,0,0,0.05)', position: 'relative' }}>
-                                           <span style={{ fontSize: '2.5rem', fontWeight: '900', color: '#1e293b' }}>
-                                                {course.title.includes('Node') ? 'JS' : course.title.includes('React') ? '⚛️' : course.title.includes('Python') ? '🐍' : course.title.includes('UI') ? '🎨' : '📚'}
-                                           </span>
-                                        </div>
+                                    <div className="course-thumb mockup-thumb" style={{ height: '220px', overflow: 'hidden' }}>
+                                        <img src={course.image} alt={course.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                     </div>
 
                                     <div className="course-info" style={{ padding: '30px' }}>

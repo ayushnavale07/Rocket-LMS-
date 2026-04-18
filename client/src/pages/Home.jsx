@@ -21,6 +21,10 @@ const Home = () => {
     const [activePlan, setActivePlan] = useState('Pro Plus');
     const [websiteReviews, setWebsiteReviews] = useState([]);
     const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
+    const [stats, setStats] = useState({ instructors: 257, students: 508, courses: 29, organizations: 6 });
+    const [categoryStats, setCategoryStats] = useState([]);
+    const [bundles, setBundles] = useState([]);
+    const [featuredCourse, setFeaturedCourse] = useState(null);
 
     // Payment States
     const [showCheckoutModal, setShowCheckoutModal] = useState(false);
@@ -33,7 +37,7 @@ const Home = () => {
         setShowAuthModal(true);
     };
 
-    const handlePurchase = async (courseId) => {
+    const handlePurchase = async (courseId, type = 'course') => {
         if (!user) {
             showAlertModal("Authentication Required", "Please login or sign up first to continue further!");
             return;
@@ -41,12 +45,11 @@ const Home = () => {
         const token = localStorage.getItem('token');
         try {
             const res = await axios.post(`${API_BASE_URL}/api/payment/create-order`,
-                { courseId },
+                { courseId, type },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            const { orderId, amount, currency, courseTitle, coursePrice, userName, userEmail, razorpayKeyId } = res.data;
+            const { orderId, amount, currency, courseTitle, userName, userEmail, razorpayKeyId } = res.data;
 
-            // Load Razorpay SDK dynamically
             const script = document.createElement('script');
             script.src = 'https://checkout.razorpay.com/v1/checkout.js';
             document.body.appendChild(script);
@@ -66,37 +69,48 @@ const Home = () => {
                                     razorpay_order_id: response.razorpay_order_id,
                                     razorpay_payment_id: response.razorpay_payment_id,
                                     razorpay_signature: response.razorpay_signature,
-                                    courseId: courseId
+                                    courseId: courseId,
+                                    type: type
                                 },
                                 { headers: { Authorization: `Bearer ${token}` } }
                             );
                             setPaymentSuccessData(verifyRes.data.transaction);
                             setShowCheckoutModal(true);
                         } catch (err) {
-                            alert('Payment verified but enrollment failed: ' + (err.response?.data?.message || 'Unknown error'));
+                            alert('Enrollment failed: ' + (err.response?.data?.message || 'Unknown error'));
                         }
                     },
                     prefill: { name: userName, email: userEmail },
-                    theme: { color: '#3b82f6' },
-                    modal: { ondismiss: () => console.log('Payment popup closed') }
+                    theme: { color: '#3b82f6' }
                 };
                 const rzp = new window.Razorpay(options);
                 rzp.open();
             };
         } catch (err) {
-            alert(err.response?.data?.message || 'Failed to initiate payment. Please log out and log back in.');
+            alert(err.response?.data?.message || 'Failed to initiate payment');
         }
     };
 
     const confirmPayment = async () => { /* handled by Razorpay */ };
 
     useEffect(() => {
-        const fetchCourses = async () => {
+        const fetchHomeData = async () => {
             try {
-                const res = await axios.get(`${API_BASE_URL}/api/courses`);
-                setCourses(res.data);
+                const [cRes, sRes, bRes] = await Promise.all([
+                    axios.get(`${API_BASE_URL}/api/courses`),
+                    axios.get(`${API_BASE_URL}/api/general-stats`),
+                    axios.get(`${API_BASE_URL}/api/courses/bundles`)
+                ]).catch(e => [[], { instructors: 250, students: 500, courses: 30, organizations: 6, categoryCounts: [] }, []]);
+                
+                const allCourses = Array.isArray(cRes.data) ? cRes.data : [];
+                setCourses(allCourses);
+                setStats(sRes.data || { instructors: 250, students: 500, courses: 30, organizations: 6 });
+                setCategoryStats(sRes.data.categoryCounts || []);
+                setBundles(bRes.data || []);
+                const fitness = allCourses.find(c => c.title.includes('Health'));
+                if (fitness) setFeaturedCourse(fitness);
             } catch (err) {
-                console.error("Error fetching courses", err);
+                console.error("Home data fetch error", err);
             } finally {
                 setLoading(false);
             }
@@ -111,7 +125,7 @@ const Home = () => {
             }
         };
 
-        fetchCourses();
+        fetchHomeData();
         fetchReviews();
     }, []);
 
@@ -213,28 +227,28 @@ const Home = () => {
                     <div className="stat-box">
                         <div className="icon blue"><span className="inner-icon">💼</span></div>
                         <div className="info">
-                            <h3>257</h3>
+                            <h3>{stats.instructors}</h3>
                             <p>Skillful Instructors</p>
                         </div>
                     </div>
                     <div className="stat-box">
                         <div className="icon green"><span className="inner-icon">🎓</span></div>
                         <div className="info">
-                            <h3>508</h3>
+                            <h3>{stats.students}</h3>
                             <p>Happy Students</p>
                         </div>
                     </div>
                     <div className="stat-box">
                         <div className="icon red"><span className="inner-icon">🎬</span></div>
                         <div className="info">
-                            <h3>29</h3>
+                            <h3>{stats.courses}</h3>
                             <p>Professional Courses</p>
                         </div>
                     </div>
                     <div className="stat-box">
                         <div className="icon yellow"><span className="inner-icon">🏢</span></div>
                         <div className="info">
-                            <h3>6</h3>
+                            <h3>{stats.organizations}</h3>
                             <p>Official Organizations</p>
                         </div>
                     </div>
@@ -251,23 +265,23 @@ const Home = () => {
                 {/* Large Featured Card (New UI) */}
                 <div className="large-featured-card">
                     <div className="card-content">
-                        <h3 className="font-outfit">Health And Fitness Masterclass</h3>
+                        <h3 className="font-outfit">{featuredCourse ? featuredCourse.title : "Health And Fitness Masterclass"}</h3>
                         <div className="stars">⭐⭐⭐⭐⭐</div>
                         <div className="instructor-minimal">
-                            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=100" alt="Jessica" />
-                            <span>Jessica Wray <span>in Health & Fitness</span></span>
+                            <img src={featuredCourse ? featuredCourse.image : "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100"} alt="Instructor" />
+                            <span>{featuredCourse ? featuredCourse.instructor : "Jessica Wray"} <span>in {featuredCourse ? featuredCourse.category : "Health & Fitness"}</span></span>
                         </div>
-                        <p>Transform your lifestyle with this all-in-one masterclass. Learn effective workouts, balanced nutrition, and wellness habits guided by experts. Perfect for all fitness levels...</p>
+                        <p>{featuredCourse ? featuredCourse.description : "Transform your lifestyle with this all-in-one masterclass. Learn effective workouts, balanced nutrition, and wellness habits guided by experts."}</p>
                         <ul className="course-perks">
                             <li>✔️ Personalized workout plans</li>
                             <li>✔️ Nutrition and meal guidance</li>
                             <li>✔️ Daily fitness challenges</li>
                         </ul>
-                        <div className="price-tag">$25 <span className="old-price">$35</span></div>
-                        <button className="btn btn-primary" onClick={() => handlePurchase('67a1da90cc0f970678dcf49b')}>Enroll in Course</button>
+                        <div className="price-tag">${featuredCourse ? featuredCourse.price : 25} {featuredCourse?.originalPrice && <span className="old-price">${featuredCourse.originalPrice}</span>}</div>
+                        <button className="btn btn-primary" onClick={() => handlePurchase(featuredCourse?._id || '67a1da90cc0f970678dcf49b')}>Enroll in Course</button>
                     </div>
                     <div className="card-image">
-                        <img src="https://images.unsplash.com/photo-1549576490-b0b4831da60a?auto=format&fit=crop&q=80&w=800" alt="Fitness" />
+                        <img src="https://images.unsplash.com/photo-1549576490-b0b4831da60a?w=800" alt="Fitness" />
                     </div>
                 </div>
 
@@ -306,7 +320,7 @@ const Home = () => {
                     <h2 className="font-outfit">Trending Categories</h2>
                 </div>
                 <div className="categories-grid-new">
-                    {[
+                    {(categoryStats.length > 0 ? categoryStats : [
                         { name: "Management", count: 2, icon: "📁", color: "#eef2ff", iconColor: "#4f46e5" },
                         { name: "Business Strategy", count: 2, icon: "🎯", color: "#fffbeb", iconColor: "#d97706" },
                         { name: "Lifestyle", count: 3, icon: "✨", color: "#f0fdf4", iconColor: "#16a34a" },
@@ -315,10 +329,13 @@ const Home = () => {
                         { name: "Design", count: 9, icon: "🎨", color: "#ecfeff", iconColor: "#0891b2" },
                         { name: "Web Development", count: 7, icon: "💻", color: "#fff7ed", iconColor: "#ea580c" },
                         { name: "Marketing", count: 0, icon: "📈", color: "#fdf2f8", iconColor: "#db2777" },
-                    ].map(cat => (
+                    ]).map(cat => (
                         <div className="category-card-new" key={cat.name}>
-                            <div className="cat-icon-box" style={{ backgroundColor: cat.color, color: cat.iconColor }}>
-                                {cat.icon}
+                            <div className="cat-icon-box" style={{ 
+                                backgroundColor: cat.color || '#f8fafc', 
+                                color: cat.iconColor || '#3b82f6' 
+                            }}>
+                                {cat.icon || '📚'}
                             </div>
                             <div className="cat-info">
                                 <h3>{cat.name}</h3>
@@ -358,27 +375,27 @@ const Home = () => {
                         <button className="view-more" onClick={() => handleNavClick('/bundles')}>View More ➔</button>
                     </div>
                     <div className="hs-grid">
-                        {[
-                            { title: "Become a Probability & Statistics Master", img: "https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&q=80&w=400", price: 25, courses: 2, instructor: "Prof. Sarah Johnson", rating: 5 },
-                            { title: "Microsoft Office Beginner to Expert Bundle", img: "https://images.unsplash.com/photo-1542744094-3a31f272c490?auto=format&fit=crop&q=80&w=400", price: 50, courses: 4, instructor: "Tech Academy", rating: 4.8 },
-                            { title: "A-Z Web Programming", img: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=400", price: 8, courses: 2, instructor: "Dev Mastery", rating: 4.9 },
-                        ].map((bundle, idx) => (
+                        {(bundles.length > 0 ? bundles : [
+                            { title: "Become a Probability & Statistics Master", image: "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=400", price: 25, courses: [1,2], instructor: "Prof. Sarah Johnson", rating: 5 },
+                            { title: "Microsoft Office Beginner to Expert Bundle", image: "https://images.unsplash.com/photo-1542744094-3a31f272c490?w=400", price: 50, courses: [1,2,3,4], instructor: "Tech Academy", rating: 4.8 },
+                            { title: "A-Z Web Programming", image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400", price: 8, courses: [1,2], instructor: "Dev Mastery", rating: 4.9 },
+                        ]).map((bundle, idx) => (
                             <div className="hs-card" key={idx}>
                                 <div className="hs-thumb">
-                                    <img src={bundle.img} alt={bundle.title} />
+                                    <img src={bundle.image} alt={bundle.title} />
                                     <span className="hs-promo">BUNDLE</span>
                                 </div>
                                 <div className="hs-info">
                                     <h3>{bundle.title}</h3>
-                                    <div className="stars">{"⭐".repeat(Math.round(bundle.rating))} ({bundle.rating})</div>
+                                    <div className="stars">{"⭐".repeat(Math.round(bundle.rating || 5))} ({bundle.rating || 5})</div>
                                     <div className="instructor-row">
                                         👤 {bundle.instructor}
                                     </div>
                                     <div className="hs-footer">
                                         <span className="hs-price">${bundle.price}</span>
-                                        <span className="hs-duration">{bundle.courses} Courses</span>
+                                        <span className="hs-duration">{bundle.courses?.length || 2} Courses</span>
                                     </div>
-                                    <button className="btn-buy mt-2 w-100" onClick={() => handlePurchase('bundle-' + idx)}>Buy Bundle</button>
+                                    <button className="btn-buy mt-2 w-100" onClick={() => handlePurchase(bundle._id || 'bundle-' + idx, 'bundle')}>Buy Bundle</button>
                                 </div>
                             </div>
                         ))}
