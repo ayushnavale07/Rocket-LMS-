@@ -8,6 +8,7 @@ import './AdminDashboard.css';
 
 const AdminDashboard = () => {
     const [courses, setCourses] = useState([]);
+    const [forums, setForums] = useState([]);
     const [stats, setStats] = useState({ revenue: 0, students: 0, courses: 0, enrollments: 0, recentPayments: [], categoryStats: [] });
     const [activeTab, setActiveTab] = useState('overview');
     const [loading, setLoading] = useState(false);
@@ -37,6 +38,12 @@ const AdminDashboard = () => {
                 const res = await axios.get(`${API_BASE_URL}/api/admin/stats`);
                 setStats(res.data);
             } catch (e) { console.error("Stats fail", e); }
+
+            // Forums
+            try {
+                const res = await axios.get(`${API_BASE_URL}/api/forum/topics`);
+                setForums(res.data);
+            } catch (e) { console.error("Forums fail", e); }
         } finally {
             setLoading(false);
         }
@@ -70,6 +77,18 @@ const AdminDashboard = () => {
             fetchData();
         } catch (err) {
             alert("Delete failed");
+        }
+    };
+
+    const handleDeleteForum = async (id) => {
+        if (!window.confirm("Delete this forum topic?")) return;
+        try {
+            await axios.delete(`${API_BASE_URL}/api/forum/topics/${id}`, {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+            });
+            fetchData();
+        } catch (err) {
+            alert("Delete failed: " + err.message);
         }
     };
 
@@ -107,12 +126,15 @@ const AdminDashboard = () => {
                         <div className={`admin-nav-item ${activeTab === 'payments' ? 'active' : ''}`} onClick={() => setActiveTab('payments')}>
                             <CreditCard size={20} /> Payments
                         </div>
+                        <div className={`admin-nav-item ${activeTab === 'forums' ? 'active' : ''}`} onClick={() => setActiveTab('forums')}>
+                            <MessageSquare size={20} /> Forums
+                        </div>
                         <div className={`admin-nav-item ${activeTab === 'content' ? 'active' : ''}`} onClick={() => setActiveTab('content')}>
                             <FileText size={20} /> Content
                         </div>
                     </nav>
                 </aside>
-
+ 
                 {/* Main Content */}
                 <main className="admin-main">
                     <header className="admin-header">
@@ -123,13 +145,13 @@ const AdminDashboard = () => {
                             </button>
                         )}
                     </header>
-
+ 
                     {loading && (
                         <div style={{display: 'flex', justifyContent: 'center', padding: '4rem'}}>
                             <Loader2 className="animate-spin" size={40} />
                         </div>
                     )}
-
+ 
                     {!loading && activeTab === 'overview' && (
                         <>
                             <div className="stats-grid">
@@ -150,7 +172,7 @@ const AdminDashboard = () => {
                                     <div className="stat-label">Enrollments</div>
                                 </div>
                             </div>
-
+ 
                             <div className="admin-card">
                                 <h3 style={{marginBottom: '1rem'}}>Recent Transactions</h3>
                                 <div className="table-container">
@@ -178,7 +200,7 @@ const AdminDashboard = () => {
                             </div>
                         </>
                     )}
-
+ 
                     {!loading && activeTab === 'courses' && (
                         <div className="admin-card">
                             <div className="table-container">
@@ -210,7 +232,7 @@ const AdminDashboard = () => {
                             </div>
                         </div>
                     )}
-
+ 
                     {!loading && activeTab === 'payments' && (
                          <div className="admin-card">
                             <h3 style={{marginBottom: '1rem'}}>Transaction History</h3>
@@ -238,7 +260,39 @@ const AdminDashboard = () => {
                             </div>
                          </div>
                     )}
-
+ 
+                    {!loading && activeTab === 'forums' && (
+                        <div className="admin-card">
+                            <h3 style={{marginBottom: '1rem'}}>Active Community Discussions</h3>
+                            <div className="table-container">
+                                <table className="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Author</th>
+                                            <th>Title</th>
+                                            <th>Category</th>
+                                            <th>Date</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {forums.map(f => (
+                                            <tr key={f._id}>
+                                                <td>{f.author?.name || 'User'}</td>
+                                                <td style={{fontWeight: '600'}}>{f.title}</td>
+                                                <td>{f.category}</td>
+                                                <td>{new Date(f.createdAt).toLocaleDateString()}</td>
+                                                <td>
+                                                    <button className="btn-icon delete" onClick={() => handleDeleteForum(f._id)}><Trash2 size={16} /></button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+ 
                     {!loading && activeTab === 'content' && (
                         <div className="admin-card" style={{textAlign: 'center', padding: '4rem'}}>
                             <h3>📝 Content Management</h3>

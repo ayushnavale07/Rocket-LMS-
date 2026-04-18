@@ -27,14 +27,14 @@ const Dashboard = () => {
             setLoading(true);
             try {
                 // Fetch purchased courses
-                const coursesRes = await fetch(`http://localhost:5000/api/courses/enrolled/${userData._id}`, {
+                const coursesRes = await fetch(`${API_BASE_URL}/api/courses/enrolled/${userData._id}`, {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
                 const coursesData = await coursesRes.json();
                 setPurchasedCourses(coursesData);
 
                 // Fetch billing history
-                const billingRes = await fetch(`http://localhost:5000/api/payment/history/${userData._id}`, {
+                const billingRes = await fetch(`${API_BASE_URL}/api/payment/history/${userData._id}`, {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
                 const billingData = await billingRes.json();

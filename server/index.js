@@ -37,6 +37,8 @@ const reviewRoutes = require('./routes/review');
 const aiRoutes = require('./routes/ai');
 const newsletterRoutes = require('./routes/newsletter');
 const adminRoutes = require('./routes/admin');
+const eventsRoutes = require('./routes/events');
+const storeRoutes = require('./routes/store');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/courses', coursesRoutes);
@@ -46,6 +48,8 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/events', eventsRoutes);
+app.use('/api/store', storeRoutes);
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/rocket-lms')
     .then(() => console.log('✅ Connected to MongoDB Atlas'))
@@ -168,7 +172,26 @@ app.get('/api/admin/seed-production', async (req, res) => {
 
         await Course.deleteMany({});
         await Course.insertMany(dummyCourses);
-        res.json({ message: "✅ Production Database Seeded Successfully with Premium Courses!" });
+
+        // Seed Events
+        const Event = require('./models/Event');
+        const dummyEvents = [
+            { id: 'event-1', title: 'DevOps and CI/CD Automation', tutor: 'Robert Ransdell', price: 20, date: 'June 30', status: 'Ongoing', image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400' },
+            { id: 'event-2', title: 'Blockchain Development', tutor: 'Robert Ransdell', price: 15, date: 'June 12', status: 'Completed', image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400' }
+        ];
+        await Event.deleteMany({});
+        await Event.insertMany(dummyEvents);
+
+        // Seed Store
+        const Product = require('./models/Product');
+        const dummyProducts = [
+            { title: 'Premium Learning Notebook', price: 15, oldPrice: 20, category: 'Stationery', image: 'https://images.unsplash.com/photo-1531346878377-a5be20888e57?w=400' },
+            { title: 'Tech Backpack', price: 45, oldPrice: 60, category: 'Accessories', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400' }
+        ];
+        await Product.deleteMany({});
+        await Product.insertMany(dummyProducts);
+
+        res.json({ message: "✅ Production Database Seeded Successfully with Courses, Events, and Store items!" });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

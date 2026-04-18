@@ -11,14 +11,22 @@ const Store = () => {
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user'));
 
-    const products = [
-        { id: 'prod-1', title: 'How to Do a Website UX Audit E-book', tutor: 'Admin', price: 20, rating: 0, image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=400' },
-        { id: 'prod-2', title: 'ChatGPT for UI/UX Design E-book', tutor: 'Ricardo Dave', price: 5, rating: 5, image: 'https://images.unsplash.com/photo-1589118949245-7d38baf380d6?auto=format&fit=crop&q=80&w=400' },
-        { id: 'prod-3', title: 'Practical UI/UX Playbook E-book', tutor: 'Admin', price: 20, rating: 5, image: 'https://images.unsplash.com/photo-1512486130939-2c4f79935e4f?auto=format&fit=crop&q=80&w=400' },
-        { id: 'prod-4', title: 'Painting tools', tutor: 'Robert Ransdell', price: 25, rating: 4, image: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&q=80&w=400' },
-        { id: 'prod-5', title: 'Advanced microscope', tutor: 'Linda Anderson', price: 290, rating: 5, image: 'https://images.unsplash.com/photo-1518152006812-edab29b069ac?auto=format&fit=crop&q=80&w=400' },
-        { id: 'prod-6', title: 'Business Software', tutor: 'Robert Ransdell', price: 75, rating: 4, image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=400' },
-    ];
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchStore = async () => {
+            try {
+                const res = await axios.get(`${API_BASE_URL}/api/store`);
+                setProducts(res.data);
+            } catch (err) {
+                console.error("Error fetching store products", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchStore();
+    }, []);
 
     const plans = [
         { id: 'vip-plan-starter-access', name: 'Starter Access', price: 20, features: ['Unlimited course access', 'Flexible payment options', 'Regular content updates'], icon: '🛡️', duration: '15 Days', subs: 100 },

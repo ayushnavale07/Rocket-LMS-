@@ -7,6 +7,7 @@ const Course = require('../models/Course');
 const Payment = require('../models/Payment');
 const Enrollment = require('../models/Enrollment');
 const jwt = require('jsonwebtoken');
+const sendEmail = require('../utils/email');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-rocket-lms-key-2024';
 
@@ -108,6 +109,30 @@ router.post('/verify-payment', verifyToken, async (req, res) => {
         if (!user.purchasedCourses) user.purchasedCourses = [];
         user.purchasedCourses.push(courseId);
         await user.save();
+
+        // Send Email Notification
+        try {
+            await sendEmail({
+                email: user.email,
+                subject: `Welcome to ${course.title}!`,
+                message: `Hi ${user.name},\n\nYou have successfully enrolled in ${course.title}. You can now start learning from your dashboard.\n\nTransaction ID: ${razorpay_payment_id}\nAmount: ₹${course.price}\n\nHappy Learning!\nTeam Rocket LMS`,
+                html: `
+                    <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                        <h2 style="color: #3b82f6;">Enrollment Successful!</h2>
+                        <p>Hi <strong>${user.name}</strong>,</p>
+                        <p>You have successfully enrolled in <strong>${course.title}</strong>.</p>
+                        <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <p style="margin: 5px 0;"><strong>Transaction ID:</strong> #${razorpay_payment_id}</p>
+                            <p style="margin: 5px 0;"><strong>Amount Paid:</strong> ₹${course.price}</p>
+                        </div>
+                        <p>You can now access your course from your student dashboard.</p>
+                        <a href="https://rocketlms.org/dashboard" style="display: inline-block; background: #3b82f6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-top: 10px;">Go to Dashboard</a>
+                    </div>
+                `
+            });
+        } catch (emailErr) {
+            console.error("Email failed but payment succeeded", emailErr);
+        }
 
         res.json({
             message: 'Enrollment successful!',

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Draggable from 'react-draggable';
 import { MessageSquare, Send, X, Minus } from 'lucide-react';
+import API_BASE_URL from '../api/config';
 import './AIChatbot.css';
 
 const AIChatbot = () => {
@@ -31,7 +32,7 @@ const AIChatbot = () => {
         setLoading(true);
 
         try {
-            const res = await fetch('http://localhost:5000/api/ai/chat', {
+            const res = await fetch(`${API_BASE_URL}/api/ai/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: userMsg })

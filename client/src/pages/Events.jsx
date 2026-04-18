@@ -10,14 +10,22 @@ const Events = () => {
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user'));
 
-    const events = [
-        { id: 'event-1', title: 'DevOps and CI/CD Automation for Modern Teams', tutor: 'Robert Ransdell', price: 20, date: 'June 30', status: 'Ongoing', img: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400' },
-        { id: 'event-2', title: 'Blockchain and Crypto Development for Applications', tutor: 'Robert Ransdell', price: 15, date: 'June 12', status: 'Completed', img: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400' },
-        { id: 'event-3', title: 'Cloud Computing Fundamentals for Modern IT Professionals', tutor: 'Robert Ransdell', price: 30, date: 'September 10', status: 'Scheduled', img: 'https://images.unsplash.com/photo-1484417894907-623942c8ee29?w=400' },
-        { id: 'event-4', title: 'Digital Marketing Mastery for High-Impact Growth', tutor: 'Robert Ransdell', price: 20, date: 'May 15', status: 'Completed', img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400' },
-        { id: 'event-5', title: 'Modern Mobile App Development for Android and iOS', tutor: 'Light Moon', price: 25, date: 'May 21', status: 'Scheduled', img: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400' },
-        { id: 'event-6', title: 'Practical Cybersecurity Best Practices for Modern Organizations', tutor: 'Light Moon', price: 45, date: 'May 10', status: 'Completed', img: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400' },
-    ];
+    const [events, setEvents] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchEvents = async () => {
+            try {
+                const res = await axios.get(`${API_BASE_URL}/api/events`);
+                setEvents(res.data);
+            } catch (err) {
+                console.error("Error fetching events", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchEvents();
+    }, []);
 
     const [validCourseId, setValidCourseId] = useState('67a1da90cc0f970678dcf49b');
 

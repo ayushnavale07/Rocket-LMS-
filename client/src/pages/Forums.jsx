@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import API_BASE_URL from '../api/config';
 import './Forums.css';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -18,7 +19,7 @@ const Forums = () => {
 
     const fetchTopics = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/forum/topics');
+            const res = await fetch(`${API_BASE_URL}/api/forum/topics`);
             const data = await res.json();
             setTopics(data);
         } catch (err) {
@@ -35,7 +36,7 @@ const Forums = () => {
             return;
         }
         try {
-            const res = await fetch('http://localhost:5000/api/forum/topics', {
+            const res = await fetch(`${API_BASE_URL}/api/forum/topics`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
