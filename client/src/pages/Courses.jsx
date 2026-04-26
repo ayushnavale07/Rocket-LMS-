@@ -122,6 +122,7 @@ const Courses = () => {
             rating: 0
         });
         setSortBy('Newest');
+        setPage(1); // Reset to first page
     };
 
     const showAlertModal = (title, message) => {
