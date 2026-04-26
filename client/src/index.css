@@ -192,3 +192,5 @@ h4,
     padding: 0 15px;
   }
 }
+.text-white { color: white !important; }
+.opacity-75 { opacity: 0.75; }

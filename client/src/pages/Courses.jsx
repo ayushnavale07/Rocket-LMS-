@@ -113,6 +113,17 @@ const Courses = () => {
         }));
     };
 
+    const resetFilters = () => {
+        setToggles({ upcoming: false, free: false, discount: false, downloadable: false });
+        setSidebarFilters({
+            types: [],
+            priceRange: 1000,
+            instructor: 'All',
+            rating: 0
+        });
+        setSortBy('Newest');
+    };
+
     const showAlertModal = (title, message) => {
         setModalConfig({ title, message });
         setShowAuthModal(true);
@@ -210,6 +221,10 @@ const Courses = () => {
 
             <main className="courses-main container">
                 <aside className="sidebar">
+                    <div className="filter-group mb-4">
+                        <button className="btn btn-outline-primary w-100 font-weight-bold" onClick={resetFilters} style={{ borderRadius: '12px', padding: '10px' }}>🔍 See All Courses</button>
+                    </div>
+
                     <div className="filter-group">
                         <h4>Type</h4>
                         <label><input type="checkbox" checked={sidebarFilters.types.includes('Live Class')} onChange={() => handleTypeChange('Live Class')} /> Live Class</label>

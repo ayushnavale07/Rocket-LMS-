@@ -110,7 +110,7 @@ const Events = () => {
                 <div className="container">
                     <div className="glass-hero-card p-5 text-center text-white">
                         <div className="premium-badge">✨ Limited Events Available</div>
-                        <h1 className="font-outfit mt-4 hero-title">Explore Upcoming Events & <br/>Secure Your Spot Today</h1>
+                        <h1 className="font-outfit mt-4 hero-title text-white">Explore Upcoming Events & <br/>Secure Your Spot Today</h1>
                         <p className="hero-description mt-3">Join industry leaders in exclusive sessions designed to elevate your career and connect you with global experts.</p>
                         <div className="hero-tags mt-4">
                             <span className="tag">#Design</span>

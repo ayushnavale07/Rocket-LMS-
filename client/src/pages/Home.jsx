@@ -350,8 +350,8 @@ const Home = () => {
             <section className="events-banner-section container">
                 <div className="events-dark-banner">
                     <div className="events-badge">New Events</div>
-                    <h2 className="font-outfit text-white">Explore Upcoming Events and Secure Your Spot Today With Ease</h2>
-                    <p>Explore our upcoming events, join in-person or online sessions, and gain valuable skills and meaningful connections.</p>
+                    <h2 className="font-outfit text-white">Explore Upcoming Events & <br/>Secure Your Spot Today</h2>
+                    <p className="text-white opacity-75">Explore our upcoming events, join in-person or online sessions, and gain valuable skills and meaningful connections.</p>
                     <div className="events-tags">
                         <span>Product Design</span> • <span>Development</span> • <span>Marketing</span> • <span>Business</span>
                     </div>
