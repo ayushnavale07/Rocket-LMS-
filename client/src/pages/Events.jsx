@@ -43,6 +43,19 @@ const Events = () => {
         fetchCourses();
     }, []);
 
+    const handleReadBlog = (blog) => {
+        alert(`Reading: ${blog.title}\n\nFull article content loading...`);
+    };
+
+    const handleNewsletterJoin = (e) => {
+        e.preventDefault();
+        const email = e.target.email.value;
+        if (email) {
+            alert(`Thank you! ${email} has been subscribed to our newsletter.`);
+            e.target.reset();
+        }
+    };
+
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [modalConfig, setModalConfig] = useState({ title: '', message: '' });
     const [showCheckoutModal, setShowCheckoutModal] = useState(false);
@@ -160,38 +173,30 @@ const Events = () => {
                 </div>
             </section>
 
-            <section className="blogs-section bg-light py-5 mb-5">
+            <section className="blogs-section bg-light py-5 mb-5" style={{ background: '#f8fafc', borderRadius: '80px', margin: '20px 40px' }}>
                 <div className="container">
                     <div className="badge-wrapper text-center">
-                        <span className="badge-small-blue">Read More</span>
+                        <span className="badge-small-blue" style={{ background: '#e0f2fe', color: '#1a73e8', padding: '6px 16px', borderRadius: '20px', fontWeight: '700' }}>Read More</span>
                     </div>
-                    <h2 className="text-center font-outfit mb-5">Blog and Articles</h2>
+                    <h2 className="text-center font-outfit mb-3 mt-3" style={{ fontSize: '2.5rem', fontWeight: '800' }}>Blog and Articles</h2>
                     <p className="text-center text-secondary mb-5">Stay informed with expert-written articles, tips, and insights to support your learning journey daily</p>
 
-                    <div className="blogs-layout">
-                        <div className="blog-main">
-                            <div className="blog-card large">
-                                <img src={blogs[0].img} alt={blogs[0].title} />
-                                <div className="blog-overlay">
-                                    <h3>{blogs[0].title}</h3>
-                                    <div className="blog-meta">
-                                        <span>👤 {blogs[0].tutor}</span>
-                                        <span>📅 {blogs[0].date}</span>
+                    <div className="blogs-modern-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '30px' }}>
+                        {blogs.map(blog => (
+                            <div className="blog-modern-card" key={blog.id} style={{ background: 'white', borderRadius: '32px', overflow: 'hidden', transition: '0.4s', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', cursor: 'pointer' }} onClick={() => handleReadBlog(blog)}>
+                                <div className="blog-thumb" style={{ height: '240px', overflow: 'hidden' }}>
+                                    <img src={blog.img} alt={blog.title} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: '0.6s' }} />
+                                </div>
+                                <div className="blog-info" style={{ padding: '30px' }}>
+                                    <div style={{ display: 'flex', gap: '15px', color: '#64748b', fontSize: '0.85rem', marginBottom: '15px' }}>
+                                        <span>👤 {blog.tutor}</span>
+                                        <span>📅 {blog.date || 'Jul 2024'}</span>
                                     </div>
+                                    <h3 style={{ fontSize: '1.25rem', fontWeight: '800', lineHeight: '1.4', marginBottom: '20px', color: '#1e293b' }}>{blog.title}</h3>
+                                    <button className="read-btn" style={{ background: 'none', border: 'none', color: '#1a73e8', fontWeight: '700', fontSize: '0.9rem', cursor: 'pointer', padding: 0 }}>Read Article ➔</button>
                                 </div>
                             </div>
-                        </div>
-                        <div className="blog-side-grid">
-                            {blogs.slice(1).map(blog => (
-                                <div className="blog-card small" key={blog.id}>
-                                    <img src={blog.img} alt={blog.title} />
-                                    <div className="blog-overlay">
-                                        <h4>{blog.title}</h4>
-                                        <span>👤 {blog.tutor}</span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                        ))}
                     </div>
                 </div>
             </section>
@@ -258,16 +263,17 @@ const Events = () => {
                 </div>
             )}
 
-            <section className="newsletter-section container mb-5">
-                <div className="newsletter-box">
-                    <div className="news-text">
-                        <h3>Subscribe to Our Newsletter 😊</h3>
-                        <p>Receive expert insights, course updates, and learning resources directly in your inbox and get notified</p>
+            <section className="newsletter-section-premium container mb-5">
+                <div className="newsletter-premium-box" style={{ background: 'linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%)', padding: '80px', borderRadius: '48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 40px 80px rgba(26, 115, 232, 0.3)', color: 'white', position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ position: 'absolute', top: '-10%', right: '-10%', width: '300px', height: '300px', background: 'rgba(255,255,255,0.05)', borderRadius: '50%' }}></div>
+                    <div className="news-content" style={{ flex: 1, zIndex: 1 }}>
+                        <h2 className="font-outfit" style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '20px' }}>Subscribe to Our Newsletter 😊</h2>
+                        <p style={{ opacity: '0.9', fontSize: '1.1rem', maxWidth: '500px' }}>Receive expert insights, course updates, and learning resources directly in your inbox and get notified</p>
                     </div>
-                    <div className="news-form">
-                        <input type="email" placeholder="Enter your email address here" />
-                        <button className="btn btn-primary">Join</button>
-                    </div>
+                    <form onSubmit={handleNewsletterJoin} className="news-form-modern" style={{ flex: 1, display: 'flex', gap: '15px', justifyContent: 'flex-end', zIndex: 1 }}>
+                        <input name="email" type="email" placeholder="Enter your email address here" required style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)', padding: '20px 30px', borderRadius: '20px', width: '100%', maxWidth: '350px', color: 'white', fontWeight: '500', outline: 'none' }} />
+                        <button type="submit" className="btn-join-modern" style={{ background: 'white', color: '#1a73e8', padding: '20px 40px', borderRadius: '20px', border: 'none', fontWeight: '800', cursor: 'pointer', transition: '0.3s' }}>Join Now</button>
+                    </form>
                 </div>
             </section>
 

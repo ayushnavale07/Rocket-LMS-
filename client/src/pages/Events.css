@@ -378,3 +378,6 @@
     font-weight: 600;
     cursor: pointer;
 }
+.blog-modern-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.12) !important; }
+.blog-modern-card:hover img { transform: scale(1.1); }
+.btn-join-modern:hover { transform: scale(1.05); background: #f0f7ff !important; }
