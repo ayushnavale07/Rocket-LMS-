@@ -18,6 +18,32 @@ const Instructors = () => {
         { id: 6, name: 'Robert Ransdell', title: 'System Administrator at Microsoft', rating: 4.75, image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200' },
     ];
 
+    const [selectedMentor, setSelectedMentor] = useState(null);
+    const [bookingDate, setBookingDate] = useState('');
+    const [bookingTime, setBookingTime] = useState('');
+    const [isBookingConfirmed, setIsBookingConfirmed] = useState(false);
+
+    const handleBookClick = (mentor) => {
+        if (!user) {
+            alert("Please login to book a session with mentors!");
+            navigate('/auth');
+            return;
+        }
+        setSelectedMentor(mentor);
+        // Default to mentor's earliest time for convenience
+        setBookingTime(mentor.time.split(' ')[3]);
+        setIsBookingConfirmed(false);
+    };
+
+    const handleConfirmBooking = () => {
+        if (!bookingDate || !bookingTime) {
+            alert("Please select both date and time for your session.");
+            return;
+        }
+        setIsBookingConfirmed(true);
+        // In a real app, you would call an API here to save the meeting
+    };
+
     return (
         <div className="instructors-page">
             <Navbar />
@@ -111,7 +137,9 @@ const Instructors = () => {
                                 <div style={{ fontSize: '0.9rem' }}>{mentor.tutor}</div>
                                 <div style={{ fontSize: '0.85rem' }}>{mentor.time}</div>
                                 <div style={{ fontSize: '1rem', fontWeight: '700', color: '#1a73e8' }}>From {mentor.rate}</div>
-                                <button style={{ background: '#1a73e8', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.8rem' }}>Book ➞</button>
+                                <button
+                                    onClick={() => handleBookClick(mentor)}
+                                    style={{ background: '#1a73e8', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.8rem' }}>Book ➞</button>
                             </div>
                         ))}
                     </div>
@@ -148,6 +176,73 @@ const Instructors = () => {
                     </div>
                 </div>
             </section>
+
+            {selectedMentor && (
+                <div className="modal-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+                    <div className="modal-card" style={{ background: 'white', padding: '40px', borderRadius: '30px', maxWidth: '500px', width: '90%', textAlign: 'center', color: '#1e293b' }}>
+                        {!isBookingConfirmed ? (
+                            <>
+                                <h3 className="font-outfit" style={{ fontSize: '1.8rem', marginBottom: '20px' }}>Book Session with {selectedMentor.name}</h3>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '20px', background: '#f8fafc', padding: '20px', borderRadius: '20px', marginBottom: '30px', textAlign: 'left' }}>
+                                    <img src={selectedMentor.img} alt={selectedMentor.name} style={{ width: '60px', height: '60px', borderRadius: '50%' }} />
+                                    <div>
+                                        <strong>{selectedMentor.rate}</strong> / Hour
+                                        <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b' }}>Availability: {selectedMentor.time}</p>
+                                    </div>
+                                </div>
+
+                                <div style={{ textAlign: 'left', marginBottom: '25px' }}>
+                                    <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.9rem', fontWeight: '600' }}>Choose Preferred Date</label>
+                                    <input
+                                        type="date"
+                                        style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #e2e8f0' }}
+                                        value={bookingDate}
+                                        onChange={(e) => setBookingDate(e.target.value)}
+                                    />
+                                </div>
+
+                                <div style={{ textAlign: 'left', marginBottom: '35px' }}>
+                                    <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.9rem', fontWeight: '600' }}>Choose Time Slot</label>
+                                    <select
+                                        style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #e2e8f0' }}
+                                        value={bookingTime}
+                                        onChange={(e) => setBookingTime(e.target.value)}
+                                    >
+                                        <option value="">Select a time</option>
+                                        <option>08:00 AM</option>
+                                        <option>09:00 AM</option>
+                                        <option>10:00 AM</option>
+                                        <option>11:00 AM</option>
+                                        <option>12:00 PM</option>
+                                        <option>01:00 PM</option>
+                                        <option>02:00 PM</option>
+                                        <option>03:00 PM</option>
+                                        <option>04:00 PM</option>
+                                    </select>
+                                </div>
+
+                                <div style={{ display: 'flex', gap: '15px' }}>
+                                    <button
+                                        onClick={() => setSelectedMentor(null)}
+                                        style={{ flex: 1, padding: '15px', borderRadius: '15px', border: '1px solid #e2e8f0', background: 'none', cursor: 'pointer', fontWeight: '700' }}>Cancel</button>
+                                    <button
+                                        onClick={handleConfirmBooking}
+                                        style={{ flex: 1, padding: '15px', borderRadius: '15px', border: 'none', background: '#1a73e8', color: 'white', cursor: 'pointer', fontWeight: '700' }}>Confirm Booking</button>
+                                </div>
+                            </>
+                        ) : (
+                            <div style={{ padding: '20px 0' }}>
+                                <div style={{ fontSize: '4rem', marginBottom: '20px' }}>✅</div>
+                                <h3 className="font-outfit" style={{ fontSize: '2rem', marginBottom: '15px' }}>Session Booked!</h3>
+                                <p style={{ color: '#64748b', marginBottom: '30px' }}>Your session with **{selectedMentor.name}** has been scheduled for **{bookingDate}** at **{bookingTime}**.</p>
+                                <button
+                                    onClick={() => setSelectedMentor(null)}
+                                    style={{ width: '100%', padding: '15px', borderRadius: '15px', border: 'none', background: '#1a73e8', color: 'white', cursor: 'pointer', fontWeight: '700' }}>Back to Mentors</button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
 
             <Footer />
         </div>
