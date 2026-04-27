@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import API_BASE_URL from '../api/config';
 import './Courses.css';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -60,8 +61,11 @@ const Courses = () => {
     useEffect(() => {
         const fetchCourses = async () => {
             try {
+                console.log("Fetching courses from:", `${API_BASE_URL}/api/courses`);
                 const res = await axios.get(`${API_BASE_URL}/api/courses`);
-                const allFetched = res.data;
+                console.log("Fetched courses:", res.data);
+                
+                const allFetched = Array.isArray(res.data) ? res.data : [];
                 const regular = allFetched.filter(c => !c.isUpcoming);
                 const upcoming = allFetched.filter(c => c.isUpcoming);
 
